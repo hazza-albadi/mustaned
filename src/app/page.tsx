@@ -1,100 +1,160 @@
-import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getCurrentProfile } from "@/lib/auth";
+import { ROLE_HOME } from "@/lib/roles";
+import { UtasLogo } from "@/components/common/utas-logo";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { ArrowLeft, Check, FileCheck2, FileText, ListChecks, Network } from "lucide-react";
 
-export default function Home() {
+const STEPS = [
+  {
+    icon: FileText,
+    title: "قدّم النموذج",
+    description: "اختر النموذج المطلوب وأدخل بياناتك مباشرة عبر البوابة.",
+  },
+  {
+    icon: Network,
+    title: "التوجيه التلقائي",
+    description: "يُوجَّه طلبك تلقائياً إلى المعتمد المختص حسب الهيكل التنظيمي.",
+  },
+  {
+    icon: ListChecks,
+    title: "تتبّع الحالة",
+    description: "تابع مسار الاعتماد لحظة بلحظة من لوحة طلباتك.",
+  },
+  {
+    icon: FileCheck2,
+    title: "احصل على النسخة المعتمدة",
+    description: "بعد الاعتماد، حمّل نسخة PDF رسمية من طلبك فوراً.",
+  },
+];
+
+export default async function RootPage() {
+  const profile = await getCurrentProfile();
+  if (profile) redirect(ROLE_HOME[profile.role]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div dir="rtl" lang="ar" className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-50 border-b border-[rgba(45,52,138,0.09)] bg-white/70 backdrop-blur-md">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6 sm:px-6">
+          <div className="flex items-center gap-2 font-semibold">
+            <UtasLogo size={40} title="جامعة التقنية والعلوم التطبيقية" />
+            <span>مستند</span>
+          </div>
+          <Button asChild variant="default">
+            <Link href="/login">تسجيل الدخول</Link>
+          </Button>
         </div>
+      </header>
+
+      <main>
+        <section className="relative overflow-hidden border-b">
+          {/* Brand pattern texture — behind all hero content. */}
+          <svg
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-5"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern id="hero-pattern" width="72" height="72" patternUnits="userSpaceOnUse">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="var(--utas-navy)" strokeWidth="1.5" />
+                <circle cx="54" cy="54" r="15" fill="none" stroke="var(--utas-orange)" strokeWidth="1.5" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+          </svg>
+
+          <div className="relative z-10 mx-auto grid max-w-5xl gap-10 px-4 py-20 sm:px-6 sm:py-28 md:grid-cols-[55fr_45fr] md:items-center md:gap-8">
+            {/* Text column */}
+            <div className="text-center md:text-start">
+              <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+                مستند. من التقديم إلى الاعتماد، دون تنقّل بين المكاتب
+              </h1>
+              <p className="mx-auto mt-4 max-w-[400px] text-sm leading-relaxed text-muted-foreground md:mx-0">
+                طلبك يُوجَّه تلقائيًا عبر الهيكل التنظيمي، وتتابع حالته أولًا بأول حتى اعتماده
+                وتوثيقه.
+              </p>
+              <div className="mt-6 flex justify-center md:justify-start">
+                <Button asChild variant="cta" size="lg" className="gap-2">
+                  <Link href="/login">
+                    تسجيل الدخول
+                    <ArrowLeft className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <p className="mt-4 text-xs text-muted-foreground">
+                اعتمادات متعددة المراحل · توجيه حسب الهيكل التنظيمي · تصدير PDF فوري
+              </p>
+            </div>
+
+            {/* Illustration column */}
+            <div className="relative mx-auto hidden h-[270px] w-full max-w-[280px] md:block">
+              {/* Layer 0 — soft background circle, centered */}
+              <div
+                className="absolute left-1/2 top-1/2 z-0 h-[210px] w-[210px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{ backgroundColor: "#E9EDFB" }}
+              />
+
+              {/* Layer 10 — tilted document card, lower-left */}
+              <div className="absolute bottom-[6%] left-[4%] z-10 h-[104px] w-[150px] -rotate-[9deg] rounded-[10px] border border-border bg-white p-3 shadow-sm">
+                <div className="space-y-1.5">
+                  <div className="h-1.5 w-3/4 rounded-full bg-gray-200" />
+                  <div className="h-1.5 w-full rounded-full bg-gray-200" />
+                  <div className="h-1.5 w-2/3 rounded-full bg-gray-200" />
+                </div>
+              </div>
+
+              {/* Layer 20 — logo tile, centered, above the document card */}
+              <div className="absolute left-1/2 top-1/2 z-20 flex h-[74px] w-[74px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl border border-border bg-white shadow-sm">
+                <UtasLogo size={44} title="جامعة التقنية والعلوم التطبيقية" />
+              </div>
+
+              {/* Layer 30 — orange checkmark badge, upper-right of the logo tile */}
+              <div className="absolute right-[calc(50%-37px)] top-[calc(50%-37px)] z-30 flex h-[30px] w-[30px] translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-utas-orange text-white shadow-sm">
+                <Check className="h-4 w-4" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-muted/30 py-16">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6">
+            <h2 className="text-center text-2xl font-bold tracking-tight">كيف تعمل المنصة</h2>
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {STEPS.map((step, i) => (
+                <Card
+                  key={step.title}
+                  className={cn(
+                    "border-t-[3px] p-5 text-center",
+                    i % 2 === 0 ? "border-t-utas-navy" : "border-t-utas-orange"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full",
+                      i % 2 === 0 ? "bg-utas-navy/10 text-utas-navy" : "bg-utas-orange/10 text-utas-orange"
+                    )}
+                  >
+                    <step.icon className="h-5 w-5" />
+                  </span>
+                  <p className="mb-1 text-xs font-semibold text-primary">{`الخطوة ${i + 1}`}</p>
+                  <p className="text-sm font-medium">{step.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="border-t py-8 text-center">
+        <p className="text-sm font-semibold">مستند</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          جامعة التقنية والعلوم التطبيقية · مركز نظم المعلومات
+        </p>
       </footer>
     </div>
   );
