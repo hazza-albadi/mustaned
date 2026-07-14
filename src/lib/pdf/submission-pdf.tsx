@@ -1,7 +1,13 @@
-"use client";
-
+import fs from "fs";
+import path from "path";
 import { Document, Page, Text, View, Image, StyleSheet, pdf } from "@react-pdf/renderer";
 import type { ResolvedFieldEntry } from "@/lib/submission-fields";
+
+// Server-only module (rendered inside /api/generate-pdf) — safe to read the
+// logo straight off disk instead of resolving it as a URL, which avoids any
+// ambiguity between a relative browser path and a server-side file path.
+const LOGO_PATH = path.join(process.cwd(), "public", "logo.png");
+const logoBuffer = fs.readFileSync(LOGO_PATH);
 
 // UTAS brand palette — kept as literal hex since @react-pdf/renderer renders
 // to a PDF canvas, not the DOM, so CSS custom properties aren't available.
@@ -117,7 +123,7 @@ function SubmissionPdfDocument({ data }: { data: SubmissionPdfData }) {
             </View>
           </View>
           {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer's Image has no alt prop; this isn't a DOM <img> */}
-          <Image src="/logo.png" style={styles.logoImage} />
+          <Image src={logoBuffer} style={styles.logoImage} />
         </View>
 
         <View style={styles.employeeSection}>
@@ -215,14 +221,6 @@ export function buildSubmissionPdfFileName(formTitle: string, submissionId: stri
   return `${sanitizeFileNamePart(formTitle) || "form"}-${submissionId}.pdf`;
 }
 
-export async function downloadSubmissionPdf(data: SubmissionPdfData, fileName: string): Promise<void> {
-  const blob = await pdf(<SubmissionPdfDocument data={data} />).toBlob();
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+export async function renderSubmissionPdf(data: SubmissionPdfData): Promise<Blob> {
+  return pdf(<SubmissionPdfDocument data={data} />).toBlob();
 }

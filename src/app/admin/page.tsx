@@ -26,24 +26,20 @@ export default async function AdminPage() {
 
   // RLS scopes this query automatically: department heads only see rows for
   // their own department, Super Admin sees everything.
-  const [{ data: submissions }, { data: department }, { data: approverProfiles }, { data: orgNodeRows }] =
-    await Promise.all([
-      supabase
-        .from("form_submissions")
-        .select(
-          "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email), department:departments(id,name,name_ar)"
-        )
-        .order("created_at", { ascending: false }),
-      profile.department_id
-        ? supabase.from("departments").select("*").eq("id", profile.department_id).single()
-        : Promise.resolve({ data: null as Department | null }),
-      // Directory used to resolve "Approved by" names. Not filtered on
-      // is_active — an approver may be deactivated after approving something.
-      supabase.from("profiles").select("id, name, name_ar").eq("role", "DEPARTMENT_HEAD"),
-      // Used to resolve the submitter's/approvers' position + section for the
-      // PDF export — same lookup the header profile chip does.
-      supabase.from("org_nodes").select("id, title, parent_id, assigned_profile_id").eq("is_active", true),
-    ]);
+  const [{ data: submissions }, { data: department }, { data: approverProfiles }] = await Promise.all([
+    supabase
+      .from("form_submissions")
+      .select(
+        "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email), department:departments(id,name,name_ar)"
+      )
+      .order("created_at", { ascending: false }),
+    profile.department_id
+      ? supabase.from("departments").select("*").eq("id", profile.department_id).single()
+      : Promise.resolve({ data: null as Department | null }),
+    // Directory used to resolve "Approved by" names. Not filtered on
+    // is_active — an approver may be deactivated after approving something.
+    supabase.from("profiles").select("id, name, name_ar").eq("role", "DEPARTMENT_HEAD"),
+  ]);
 
   const approvers = ((approverProfiles ?? []) as Profile[]).map((p) => ({
     id: p.id,
@@ -61,7 +57,6 @@ export default async function AdminPage() {
         submissions={(submissions ?? []) as unknown as FormSubmissionWithRelations[]}
         approverId={profile.id}
         approvers={approvers}
-        orgNodes={orgNodeRows ?? []}
         role={profile.role}
       />
     </AppShell>

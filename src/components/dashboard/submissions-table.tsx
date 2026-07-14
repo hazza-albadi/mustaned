@@ -25,7 +25,6 @@ import { DownloadPdfButton } from "@/components/common/download-pdf-button";
 import { useI18n } from "@/lib/i18n/config";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { ApproverInfo } from "@/lib/approver-summary";
-import type { OrgNodeLite } from "@/lib/org-position";
 import type { FormSubmissionWithRelations, SubmissionStatus } from "@/types";
 import { format } from "date-fns";
 import { Search, Eye } from "lucide-react";
@@ -35,11 +34,9 @@ const PAGE_SIZE = 8;
 export function SubmissionsTable({
   submissions,
   approvers,
-  orgNodes,
 }: {
   submissions: FormSubmissionWithRelations[];
   approvers: ApproverInfo[];
-  orgNodes: OrgNodeLite[];
 }) {
   const { t, locale } = useI18n();
   const [search, setSearch] = useState("");
@@ -130,9 +127,7 @@ export function SubmissionsTable({
                     <Button size="sm" variant="outline" className="gap-1" onClick={() => setSelected(s)}>
                       <Eye className="h-3.5 w-3.5" /> {t("common.view")}
                     </Button>
-                    {s.status === "APPROVED" && (
-                      <DownloadPdfButton submission={s} approvers={approvers} orgNodes={orgNodes} />
-                    )}
+                    {s.status === "APPROVED" && <DownloadPdfButton submissionId={s.id} />}
                   </div>
                 </TableCell>
               </TableRow>
@@ -146,7 +141,6 @@ export function SubmissionsTable({
       <SubmissionDetailDialog
         submission={selected}
         approvers={approvers}
-        orgNodes={orgNodes}
         open={!!selected}
         onOpenChange={(o) => !o && setSelected(null)}
       />

@@ -12,7 +12,6 @@ import { DownloadPdfButton } from "@/components/common/download-pdf-button";
 import { useI18n } from "@/lib/i18n/config";
 import { resolveSubmissionFields } from "@/lib/submission-fields";
 import { getApprovalSummary, type ApproverInfo } from "@/lib/approver-summary";
-import type { OrgNodeLite } from "@/lib/org-position";
 import { format } from "date-fns";
 import type { FormSubmissionWithRelations } from "@/types";
 import { File as FileIcon } from "lucide-react";
@@ -20,13 +19,11 @@ import { File as FileIcon } from "lucide-react";
 export function SubmissionDetailDialog({
   submission,
   approvers,
-  orgNodes,
   open,
   onOpenChange,
 }: {
   submission: FormSubmissionWithRelations | null;
   approvers: ApproverInfo[];
-  orgNodes: OrgNodeLite[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -123,7 +120,7 @@ export function SubmissionDetailDialog({
           )}
 
           {submission.status === "APPROVED" && (
-            <DownloadPdfButton submission={submission} approvers={approvers} orgNodes={orgNodes} variant="default" />
+            <DownloadPdfButton submissionId={submission.id} variant="default" />
           )}
         </div>
       </DialogContent>

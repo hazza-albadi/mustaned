@@ -4,7 +4,6 @@ import { useI18n } from "@/lib/i18n/config";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { SubmissionsTable } from "@/components/dashboard/submissions-table";
 import type { ApproverInfo } from "@/lib/approver-summary";
-import type { OrgNodeLite } from "@/lib/org-position";
 import type { FormSubmissionWithRelations } from "@/types";
 import { ClipboardList, Clock, CheckCircle2, XCircle } from "lucide-react";
 
@@ -12,12 +11,10 @@ export function DashboardContent({
   submissions,
   stats,
   approvers,
-  orgNodes,
 }: {
   submissions: FormSubmissionWithRelations[];
   stats: { total: number; pending: number; approved: number; rejected: number };
   approvers: ApproverInfo[];
-  orgNodes: OrgNodeLite[];
 }) {
   const { t } = useI18n();
 
@@ -33,7 +30,7 @@ export function DashboardContent({
       </div>
 
       <section className="space-y-4">
-        <SubmissionsTable submissions={submissions} approvers={approvers} orgNodes={orgNodes} />
+        <SubmissionsTable submissions={submissions} approvers={approvers} />
       </section>
     </div>
   );

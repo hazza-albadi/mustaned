@@ -36,7 +36,6 @@ import {
   CartesianGrid,
 } from "recharts";
 import type { ApproverInfo } from "@/lib/approver-summary";
-import type { OrgNodeLite } from "@/lib/org-position";
 import type { FormSubmissionWithRelations, Role } from "@/types";
 import { StatusBadge } from "@/components/common/status-badge";
 import { format } from "date-fns";
@@ -48,13 +47,11 @@ export function AdminContent({
   submissions,
   approverId,
   approvers,
-  orgNodes,
   role,
 }: {
   submissions: FormSubmissionWithRelations[];
   approverId: string;
   approvers: ApproverInfo[];
-  orgNodes: OrgNodeLite[];
   role: Role;
 }) {
   const { t, locale } = useI18n();
@@ -218,9 +215,7 @@ export function AdminContent({
                         <Button size="sm" variant="outline" className="gap-1" onClick={() => setViewTarget(s)}>
                           <Eye className="h-3.5 w-3.5" /> {t("common.view")}
                         </Button>
-                        {s.status === "APPROVED" && (
-                          <DownloadPdfButton submission={s} approvers={approvers} orgNodes={orgNodes} />
-                        )}
+                        {s.status === "APPROVED" && <DownloadPdfButton submissionId={s.id} />}
                         {actionable && (
                           <>
                             <Button
@@ -264,7 +259,6 @@ export function AdminContent({
       <SubmissionDetailDialog
         submission={viewTarget}
         approvers={approvers}
-        orgNodes={orgNodes}
         open={!!viewTarget}
         onOpenChange={(open) => !open && setViewTarget(null)}
       />

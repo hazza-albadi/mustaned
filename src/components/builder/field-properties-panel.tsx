@@ -14,6 +14,36 @@ import type { FormField } from "@/types";
 import { Loader2, Plus, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
+// Re-encodes any uploaded image through <canvas> before it's stored, always
+// producing a baseline JPEG — canvas.toBlob() never emits progressive JPEG
+// in any browser. This is the root-cause fix for @react-pdf/renderer's
+// bundled decoder hanging indefinitely on progressive JPEGs when the image
+// is later embedded in a submission PDF export.
+async function reencodeAsBaselineJpeg(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file);
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas is not supported in this browser");
+    // JPEG has no alpha channel — flatten onto white first so a transparent
+    // source (e.g. a PNG) doesn't end up with a black background.
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bitmap, 0, 0);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
+    if (!blob) throw new Error("Failed to re-encode image");
+    return blob;
+  } finally {
+    bitmap.close();
+  }
+}
+
+function sanitizeToJpgName(name: string): string {
+  return `${name.replace(/\.[^./\\]+$/, "").replace(/[^a-zA-Z0-9-_]+/g, "-")}.jpg`;
+}
+
 export function FieldPropertiesPanel({
   field,
   onChange,
@@ -57,9 +87,11 @@ export function FieldPropertiesPanel({
 
     setUploadingImage(true);
     try {
-      const path = `field-images/${userId}/${field.id}/${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage.from("form-files").upload(path, file, {
+      const jpeg = await reencodeAsBaselineJpeg(file);
+      const path = `field-images/${userId}/${field.id}/${Date.now()}-${sanitizeToJpgName(file.name)}`;
+      const { error: uploadError } = await supabase.storage.from("form-files").upload(path, jpeg, {
         upsert: false,
+        contentType: "image/jpeg",
       });
       if (uploadError) throw uploadError;
 
