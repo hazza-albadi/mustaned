@@ -38,17 +38,12 @@ interface DraftShape {
 export function DynamicFormRenderer({
   form,
   userId,
-  employeeDepartmentId,
   hasOrgNodeAssignment,
 }: {
   form: FormDefinition;
   userId: string;
-  // The submitting employee's own department — pre-fills form_submissions.department_id
-  // when set. This is legacy (pre-org-tree) scaffolding, so it's fine for it to be null.
-  employeeDepartmentId: string | null;
   // Whether the employee holds a position in the org tree. Routing resolves
-  // through approval_chain / org_nodes, so this alone is enough to submit —
-  // an employee only needs one of employeeDepartmentId or this to be set.
+  // through approval_chain / org_nodes, so this is required to submit.
   hasOrgNodeAssignment: boolean;
 }) {
   const { locale, t } = useI18n();
@@ -57,7 +52,7 @@ export function DynamicFormRenderer({
   const sortedFields = useMemo(() => [...form.fields].sort((a, b) => a.order - b.order), [form.fields]);
   const draftKey = `draft:${form.id}:${userId}`;
   const draftIdRef = useRef(uuidv4());
-  const hasRouting = Boolean(employeeDepartmentId) || hasOrgNodeAssignment;
+  const hasRouting = hasOrgNodeAssignment;
 
   const [files, setFiles] = useState<SubmissionFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -157,7 +152,6 @@ export function DynamicFormRenderer({
       const { error } = await supabase.from("form_submissions").insert({
         form_id: form.id,
         submitted_by: userId,
-        department_id: employeeDepartmentId,
         data: values.data,
         files,
         status: "PENDING",

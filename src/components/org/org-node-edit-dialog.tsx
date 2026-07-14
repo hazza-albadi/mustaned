@@ -124,7 +124,6 @@ export function OrgNodeEditDialog({
             name_ar: assignedProfile.name_ar ?? "",
             email: personEmail,
             role: assignedProfile.role,
-            department_id: assignedProfile.department_id ?? null,
           }),
         });
         const personBody = await personRes.json().catch(() => ({}));

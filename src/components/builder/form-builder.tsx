@@ -32,9 +32,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { ApprovalChainStep, Department, FieldType, FormDefinition, FormField, OrgNode } from "@/types";
+import type { ApprovalChainStep, FieldType, FormDefinition, FormField, OrgNode } from "@/types";
 import { Eye, Save, Archive, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -69,12 +68,10 @@ function CanvasDropArea({
 
 export function FormBuilder({
   initialForm,
-  departments,
   orgNodes,
   userId,
 }: {
   initialForm: FormDefinition | null;
-  departments: Department[];
   orgNodes: OrgNode[];
   userId: string;
 }) {
@@ -87,9 +84,6 @@ export function FormBuilder({
   const [description, setDescription] = useState(initialForm?.description ?? "");
   const [descriptionAr, setDescriptionAr] = useState(initialForm?.description_ar ?? "");
   const [fields, setFields] = useState<FormField[]>(initialForm?.fields ?? []);
-  const [allowedDepartments, setAllowedDepartments] = useState<string[] | null>(
-    initialForm?.allowed_departments ?? null
-  );
   // Legacy flat approver list — preserved as-is on save (no longer editable
   // from this UI); required only so old forms aren't silently wiped when
   // re-saved through the builder.
@@ -157,14 +151,6 @@ export function FormBuilder({
     if (selectedFieldId === id) setSelectedFieldId(null);
   }
 
-  function toggleDepartment(deptId: string) {
-    setAllowedDepartments((prev) => {
-      if (prev === null) return departments.filter((d) => d.id !== deptId).map((d) => d.id);
-      const has = prev.includes(deptId);
-      return has ? prev.filter((d) => d !== deptId) : [...prev, deptId];
-    });
-  }
-
   async function persist(publish: boolean) {
     const payload = {
       title,
@@ -172,7 +158,6 @@ export function FormBuilder({
       description,
       description_ar: descriptionAr,
       fields: renumbered(sortedFields),
-      allowed_departments: allowedDepartments,
       required_approvers: requiredApprovers,
       approval_chain: approvalChain,
       requires_approval: requiresApproval,
@@ -268,29 +253,6 @@ export function FormBuilder({
           <div className="space-y-2">
             <Label>{t("builder.descriptionAr")}</Label>
             <Textarea value={descriptionAr} onChange={(e) => setDescriptionAr(e.target.value)} dir="rtl" />
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <Label>{t("builder.allowedDepartments")}</Label>
-            <div className="flex flex-wrap gap-3">
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={allowedDepartments === null}
-                  onCheckedChange={(c) => setAllowedDepartments(c ? null : [])}
-                />
-                {t("builder.allDepartments")}
-              </label>
-              {departments.map((d) => (
-                <label key={d.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={allowedDepartments?.includes(d.id) ?? false}
-                    disabled={allowedDepartments === null}
-                    onCheckedChange={() => toggleDepartment(d.id)}
-                  />
-                  {locale === "ar" ? d.name_ar : d.name}
-                </label>
-              ))}
-            </div>
           </div>
 
           <div className="space-y-3 sm:col-span-2">

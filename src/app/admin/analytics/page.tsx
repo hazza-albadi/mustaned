@@ -15,7 +15,7 @@ export default async function AnalyticsPage() {
     supabase
       .from("form_submissions")
       .select(
-        "*, form:forms(id,title,title_ar), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email), department:departments(id,name,name_ar)"
+        "*, form:forms(id,title,title_ar), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email)"
       ),
     // Full directory (not role-filtered) so the approval-steps export can
     // resolve names for any approver, including org-node-only employees.
@@ -26,7 +26,7 @@ export default async function AnalyticsPage() {
   ]);
 
   return (
-    <AppShell profile={profile} departmentName={null} permissions={permissions}>
+    <AppShell profile={profile} permissions={permissions}>
       <AnalyticsContent
         forms={(forms ?? []) as FormDefinition[]}
         submissions={(submissions ?? []) as unknown as FormSubmissionWithRelations[]}

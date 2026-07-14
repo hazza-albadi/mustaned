@@ -10,7 +10,7 @@ export default async function AdminNoAccessPage() {
   const profile = await requireRole(["ADMIN"]);
 
   return (
-    <AppShell profile={profile} departmentName={null} permissions={[]}>
+    <AppShell profile={profile} permissions={[]}>
       <NoAccessMessage />
     </AppShell>
   );

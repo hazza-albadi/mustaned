@@ -96,7 +96,6 @@ export function SubmissionsTable({
           <TableHeader>
             <TableRow>
               <TableHead>{t("common.name")}</TableHead>
-              <TableHead>{t("common.department")}</TableHead>
               <TableHead>{t("common.date")}</TableHead>
               <TableHead>{t("common.status")}</TableHead>
               <TableHead>{t("common.actions")}</TableHead>
@@ -105,7 +104,7 @@ export function SubmissionsTable({
           <TableBody>
             {pageItems.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                   {t("common.noResults")}
                 </TableCell>
               </TableRow>
@@ -114,9 +113,6 @@ export function SubmissionsTable({
               <TableRow key={s.id} className="cursor-pointer" onClick={() => setSelected(s)}>
                 <TableCell className="font-medium">
                   {locale === "ar" && s.form?.title_ar ? s.form.title_ar : s.form?.title}
-                </TableCell>
-                <TableCell>
-                  {locale === "ar" ? s.department?.name_ar : s.department?.name}
                 </TableCell>
                 <TableCell>{format(new Date(s.created_at), "PP")}</TableCell>
                 <TableCell>

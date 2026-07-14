@@ -122,7 +122,6 @@ export function AdminContent({
       submissions.map((s) => ({
         form: s.form?.title,
         submitted_by: s.submitter?.name,
-        department: s.department?.name,
         status: s.status,
         submitted_at: s.created_at,
         approver_comment: s.approver_comment ?? "",

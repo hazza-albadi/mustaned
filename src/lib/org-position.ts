@@ -21,15 +21,9 @@ export function resolveOrgPosition(profileId: string, nodes: OrgNodeLite[]): Org
   return { title: node.title, section: parent?.title ?? null };
 }
 
-// "Position, Section" when an org node is assigned; falls back to the raw
-// department name for legacy department-based accounts with no org node.
-export function formatPositionLabel(
-  position: OrgPosition | null,
-  departmentFallback: string | null,
-  locale: Locale
-): string | null {
-  if (position) {
-    return position.section ? `${position.title}${locale === "ar" ? "، " : ", "}${position.section}` : position.title;
-  }
-  return departmentFallback;
+// "Position, Section" when an org node is assigned; null otherwise (no
+// position held).
+export function formatPositionLabel(position: OrgPosition | null, locale: Locale): string | null {
+  if (!position) return null;
+  return position.section ? `${position.title}${locale === "ar" ? "، " : ", "}${position.section}` : position.title;
 }

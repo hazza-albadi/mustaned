@@ -44,7 +44,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   const admin = createAdminClient();
-  const { name, name_ar, email, role, department_id, password } = parsed.data;
+  const { name, name_ar, email, role, password } = parsed.data;
 
   if (!caller.isSuperAdmin) {
     const { data: target } = await admin.from("profiles").select("role").eq("id", id).maybeSingle();
@@ -64,7 +64,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { error: profileError } = await admin
     .from("profiles")
-    .update({ name, name_ar, ...(email ? { email } : {}), role, department_id: department_id ?? null })
+    .update({ name, name_ar, ...(email ? { email } : {}), role })
     .eq("id", id);
 
   if (profileError) {
@@ -73,10 +73,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (password) {
     await admin.auth.admin.updateUserById(id, { password });
-  }
-
-  if (role === "DEPARTMENT_HEAD" && department_id) {
-    await admin.from("departments").update({ head_id: id }).eq("id", department_id);
   }
 
   return NextResponse.json({ ok: true });

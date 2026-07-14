@@ -18,7 +18,6 @@ export const ADMIN_PERMISSION_PRIORITY: AdminPermission[] = [
   "view_submissions",
   "manage_forms",
   "manage_org_chart",
-  "manage_departments",
   "view_analytics",
 ];
 
@@ -26,7 +25,6 @@ export const ADMIN_PERMISSION_HOME: Record<AdminPermission, string> = {
   view_submissions: "/admin",
   manage_forms: "/admin/builder",
   manage_org_chart: "/admin/org",
-  manage_departments: "/admin/departments",
   view_analytics: "/admin/analytics",
 };
 

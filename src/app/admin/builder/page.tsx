@@ -16,7 +16,7 @@ export default async function BuilderListPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <AppShell profile={profile} departmentName={null} permissions={permissions}>
+    <AppShell profile={profile} permissions={permissions}>
       <FormsList forms={(forms ?? []) as FormDefinition[]} />
     </AppShell>
   );

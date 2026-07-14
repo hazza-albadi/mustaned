@@ -2,7 +2,7 @@ import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/nav/app-shell";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
-import type { Department, FormSubmissionWithRelations, Profile } from "@/types";
+import type { FormSubmissionWithRelations, Profile } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -10,14 +10,11 @@ export default async function DashboardPage() {
   const profile = await requireRole(["DEPARTMENT_HEAD"]);
   const supabase = await createClient();
 
-  const [{ data: department }, { data: submissions }, { data: approverProfiles }] = await Promise.all([
-    profile.department_id
-      ? supabase.from("departments").select("*").eq("id", profile.department_id).single()
-      : Promise.resolve({ data: null as Department | null }),
+  const [{ data: submissions }, { data: approverProfiles }] = await Promise.all([
     supabase
       .from("form_submissions")
       .select(
-        "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email), department:departments(id,name,name_ar)"
+        "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email)"
       )
       .eq("submitted_by", profile.id)
       .order("created_at", { ascending: false }),
@@ -41,7 +38,7 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <AppShell profile={profile} departmentName={department ? (department as Department).name : null}>
+    <AppShell profile={profile}>
       <DashboardContent submissions={subs} stats={stats} approvers={approvers} />
     </AppShell>
   );

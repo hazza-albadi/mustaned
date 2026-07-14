@@ -1,7 +1,9 @@
 /**
  * Seeds Supabase with the fixed demo dataset described in the project spec:
- * 5 departments, 12 users (1 Super Admin, 5 Department Heads, 6 Employees),
- * and 12 sample dynamic forms.
+ * 1 Super Admin, 6 Employees, and 12 sample dynamic forms. Department Head
+ * accounts are no longer seeded here — routing/approval is org-tree based
+ * (see seed-org.ts); create a Department Head via the org chart's "assign
+ * person" flow on a position instead.
  *
  * Usage: npm run seed
  * Requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local
@@ -26,14 +28,6 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-const DEPARTMENTS = [
-  { key: "eng", name: "Engineering", name_ar: "الهندسة" },
-  { key: "it", name: "IT", name_ar: "تقنية المعلومات" },
-  { key: "hr", name: "HR", name_ar: "الموارد البشرية" },
-  { key: "fin", name: "Finance", name_ar: "المالية" },
-  { key: "bus", name: "Business", name_ar: "الأعمال" },
-] as const;
-
 function field(partial: Partial<FormField> & Pick<FormField, "type" | "label" | "order">): FormField {
   return {
     id: uuidv4(),
@@ -49,32 +43,11 @@ function field(partial: Partial<FormField> & Pick<FormField, "type" | "label" | 
   };
 }
 
-async function upsertDepartments() {
-  const ids: Record<string, string> = {};
-  for (const dept of DEPARTMENTS) {
-    const { data: existing } = await supabase.from("departments").select("id").eq("name", dept.name).maybeSingle();
-    if (existing) {
-      ids[dept.key] = existing.id;
-      continue;
-    }
-    const { data, error } = await supabase
-      .from("departments")
-      .insert({ name: dept.name, name_ar: dept.name_ar })
-      .select("id")
-      .single();
-    if (error) throw error;
-    ids[dept.key] = data.id;
-  }
-  console.log("Departments ready:", ids);
-  return ids;
-}
-
 async function createUserIfMissing(opts: {
   email: string;
   name: string;
   name_ar?: string;
   role: "SUPER_ADMIN" | "DEPARTMENT_HEAD" | "EMPLOYEE";
-  department_id?: string;
 }) {
   const { data: existingProfile } = await supabase
     .from("profiles")
@@ -93,7 +66,6 @@ async function createUserIfMissing(opts: {
       name: opts.name,
       name_ar: opts.name_ar,
       role: opts.role,
-      department_id: opts.department_id,
     },
   });
 
@@ -105,7 +77,7 @@ async function createUserIfMissing(opts: {
   return data.user.id;
 }
 
-async function seedUsers(deptIds: Record<string, string>) {
+async function seedUsers() {
   const adminId = await createUserIfMissing({
     email: "==",
     name: "Super Admin",
@@ -113,27 +85,12 @@ async function seedUsers(deptIds: Record<string, string>) {
     role: "SUPER_ADMIN",
   });
 
-  const heads: Record<string, string> = {};
-  for (const dept of DEPARTMENTS) {
-    const headId = await createUserIfMissing({
-      email: `head_${dept.key}@company.com`,
-      name: `${dept.name} Head`,
-      name_ar: `رئيس ${dept.name_ar}`,
-      role: "DEPARTMENT_HEAD",
-      department_id: deptIds[dept.key],
-    });
-    heads[dept.key] = headId;
-    await supabase.from("departments").update({ head_id: headId }).eq("id", deptIds[dept.key]);
-  }
-
-  const employeeDepts = ["eng", "it", "hr", "fin", "bus", "eng"] as const;
   for (let i = 1; i <= 6; i++) {
     await createUserIfMissing({
       email: `emp${i}@company.com`,
       name: `Employee ${i}`,
       name_ar: `موظف ${i}`,
       role: "EMPLOYEE",
-      department_id: deptIds[employeeDepts[i - 1]],
     });
   }
 
@@ -282,8 +239,7 @@ async function seedForms(adminId: string) {
 }
 
 async function main() {
-  const deptIds = await upsertDepartments();
-  const adminId = await seedUsers(deptIds);
+  const adminId = await seedUsers();
   await seedForms(adminId);
   console.log("\nSeed complete. Default password for all seeded users:", SEED_USER_PASSWORD);
 }

@@ -116,7 +116,6 @@ export async function updateSession(request: NextRequest) {
       const isPermissionGated =
         path.startsWith("/admin/builder") ||
         path.startsWith("/admin/org") ||
-        path.startsWith("/admin/departments") ||
         path.startsWith("/admin/analytics");
 
       // Coarse gate only — Super Admin and Admin both pass here. Each page's

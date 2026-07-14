@@ -23,7 +23,7 @@ export default async function AdminAccountsPage() {
   }
 
   return (
-    <AppShell profile={profile} departmentName={null}>
+    <AppShell profile={profile}>
       <AdminAccountsTable admins={(admins ?? []) as Profile[]} permissionsByAdmin={permissionsByAdmin} />
     </AppShell>
   );

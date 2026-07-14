@@ -28,7 +28,6 @@
     "noResults": "لا توجد نتائج",
     "name": "الاسم",
     "email": "البريد الإلكتروني",
-    "department": "القسم",
     "role": "الدور",
     "status": "الحالة",
     "date": "التاريخ",
@@ -73,7 +72,6 @@
     "allSubmissions": "جميع الطلبات",
     "formBuilder": "منشئ النماذج",
     "orgChart": "الهيكل التنظيمي",
-    "departments": "الأقسام",
     "analytics": "التحليلات",
     "admins": "المسؤولون"
   },
@@ -95,14 +93,11 @@
     "viewedAs": "معروض كـ"
   },
   "fill": {
-    "step1Title": "اختر قسمك",
-    "step1Subtitle": "اختر القسم الذي يتبع له هذا الطلب. سيحدد هذا من سيوافق عليه.",
-    "selectDepartment": "اختر القسم",
     "step2Title": "تفاصيل النموذج",
     "attachments": "المرفقات",
     "submitSuccess": "تم إرسال طلبك بنجاح",
     "submitError": "فشل إرسال طلبك",
-    "noDepartmentError": "أنت غير مُعيَّن إلى أي قسم أو منصب. يرجى التواصل مع المسؤول.",
+    "noDepartmentError": "أنت غير مُعيَّن إلى أي منصب. يرجى التواصل مع المسؤول.",
     "draftSaved": "تم حفظ المسودة",
     "continueDraft": "لديك مسودة محفوظة لهذا النموذج. هل تريد المتابعة من حيث توقفت؟",
     "discardDraft": "تجاهل",
@@ -141,7 +136,6 @@
       "view_submissions": "عرض الطلبات",
       "manage_forms": "إدارة النماذج",
       "manage_org_chart": "إدارة الهيكل التنظيمي",
-      "manage_departments": "إدارة الأقسام",
       "view_analytics": "عرض التحليلات"
     }
   },
@@ -164,8 +158,6 @@
     "options": "الخيارات",
     "addOption": "إضافة خيار",
     "requiredField": "حقل مطلوب",
-    "allowedDepartments": "الأقسام المسموح لها",
-    "allDepartments": "جميع الأقسام",
     "requiresApproval": "يتطلب موافقة",
     "requiresComment": "يتطلب تعليقاً عند الرفض",
     "saveForm": "حفظ النموذج",
@@ -193,15 +185,6 @@
       "section_heading": "عنوان قسم",
       "image_block": "كتلة صورة"
     }
-  },
-  "departments": {
-    "title": "الأقسام",
-    "newDepartment": "قسم جديد",
-    "editDepartment": "تعديل القسم",
-    "nameEn": "الاسم (إنجليزي)",
-    "nameAr": "الاسم (عربي)",
-    "head": "رئيس القسم",
-    "noHead": "لا يوجد رئيس معين"
   },
   "profile": {
     "position": "المنصب",

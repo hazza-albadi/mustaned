@@ -9,7 +9,6 @@ export interface CreateAuthUserInput {
     name: string;
     name_ar?: string;
     role: "SUPER_ADMIN" | "DEPARTMENT_HEAD" | "EMPLOYEE";
-    department_id?: string | null;
   };
 }
 
@@ -37,7 +36,6 @@ export async function createAuthUser({ email, password, metadata }: CreateAuthUs
       name: metadata.name,
       name_ar: metadata.name_ar ?? "",
       role: metadata.role,
-      department_id: metadata.department_id ?? "",
     },
   });
 }

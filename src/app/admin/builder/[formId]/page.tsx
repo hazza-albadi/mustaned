@@ -3,7 +3,7 @@ import { requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/nav/app-shell";
 import { FormBuilder } from "@/components/builder/form-builder";
-import type { Department, FormDefinition, OrgNode } from "@/types";
+import type { FormDefinition, OrgNode } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +16,7 @@ export default async function BuilderEditPage({
   const { profile, permissions } = await requirePermission("manage_forms");
   const supabase = await createClient();
 
-  const [{ data: departments }, { data: orgNodes }] = await Promise.all([
-    supabase.from("departments").select("*").eq("is_active", true).order("name"),
-    supabase.from("org_nodes").select("*").eq("is_active", true).order("title"),
-  ]);
+  const { data: orgNodes } = await supabase.from("org_nodes").select("*").eq("is_active", true).order("title");
 
   let initialForm: FormDefinition | null = null;
 
@@ -30,10 +27,9 @@ export default async function BuilderEditPage({
   }
 
   return (
-    <AppShell profile={profile} departmentName={null} permissions={permissions}>
+    <AppShell profile={profile} permissions={permissions}>
       <FormBuilder
         initialForm={initialForm}
-        departments={(departments ?? []) as Department[]}
         orgNodes={(orgNodes ?? []) as OrgNode[]}
         userId={profile.id}
       />

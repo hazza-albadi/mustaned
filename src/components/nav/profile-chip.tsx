@@ -17,11 +17,9 @@ interface OrgPositionInfo {
 
 export function ProfileChip({
   profile,
-  departmentName,
   permissions,
 }: {
   profile: Profile;
-  departmentName: string | null;
   permissions: AdminPermission[];
 }) {
   const { t } = useI18n();
@@ -97,7 +95,6 @@ export function ProfileChip({
               <Badge variant="secondary" className="text-[10px]">
                 {positionLabel}
               </Badge>
-              {departmentName && <span className="text-xs text-muted-foreground">{departmentName}</span>}
             </div>
           </div>
         </button>

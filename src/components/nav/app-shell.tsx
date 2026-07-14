@@ -17,7 +17,6 @@ import {
   ClipboardCheck,
   FileEdit,
   Network,
-  Building2,
   BarChart3,
   ShieldCheck,
   LogOut,
@@ -50,7 +49,6 @@ const NAV_ITEMS_BY_ROLE: Record<Exclude<Profile["role"], "ADMIN">, NavItem[]> = 
     { href: "/admin", icon: ClipboardCheck, labelKey: "nav.allSubmissions" },
     { href: "/admin/builder", icon: FileEdit, labelKey: "nav.formBuilder" },
     { href: "/admin/org", icon: Network, labelKey: "nav.orgChart" },
-    { href: "/admin/departments", icon: Building2, labelKey: "nav.departments" },
     { href: "/admin/analytics", icon: BarChart3, labelKey: "nav.analytics" },
     { href: "/admin/admins", icon: ShieldCheck, labelKey: "nav.admins" },
   ],
@@ -60,7 +58,6 @@ const ADMIN_PERMISSION_NAV: Record<AdminPermission, NavItem> = {
   view_submissions: { href: "/admin", icon: ClipboardCheck, labelKey: "nav.allSubmissions" },
   manage_forms: { href: "/admin/builder", icon: FileEdit, labelKey: "nav.formBuilder" },
   manage_org_chart: { href: "/admin/org", icon: Network, labelKey: "nav.orgChart" },
-  manage_departments: { href: "/admin/departments", icon: Building2, labelKey: "nav.departments" },
   view_analytics: { href: "/admin/analytics", icon: BarChart3, labelKey: "nav.analytics" },
 };
 
@@ -106,12 +103,10 @@ function NavLinks({
 
 export function AppShell({
   profile,
-  departmentName,
   permissions = [],
   children,
 }: {
   profile: Profile;
-  departmentName: string | null;
   // Only meaningful when profile.role === "ADMIN" — ignored otherwise.
   permissions?: AdminPermission[];
   children: React.ReactNode;
@@ -154,7 +149,7 @@ export function AppShell({
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
-          <ProfileChip profile={profile} departmentName={departmentName} permissions={permissions} />
+          <ProfileChip profile={profile} permissions={permissions} />
           <Button variant="ghost" size="icon" onClick={handleLogout} disabled={signingOut} title={t("common.logout")}>
             <LogOut className="h-4 w-4" />
           </Button>

@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   const { data: submission } = await supabase
     .from("form_submissions")
     .select(
-      "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email), department:departments(id,name,name_ar)"
+      "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email)"
     )
     .eq("id", submissionId)
     .maybeSingle();
@@ -61,19 +61,13 @@ export async function POST(request: Request) {
 
   const formTitle = (locale === "ar" && sub.form?.title_ar ? sub.form.title_ar : sub.form?.title) ?? "Form";
   const fields = resolveSubmissionFields(sub.form?.fields, sub.data, locale);
-  const departmentFallback =
-    (locale === "ar" && sub.department?.name_ar ? sub.department.name_ar : sub.department?.name) ?? null;
 
-  const employeePositionLabel = formatPositionLabel(
-    resolveOrgPosition(sub.submitted_by, orgNodes),
-    departmentFallback,
-    locale
-  );
+  const employeePositionLabel = formatPositionLabel(resolveOrgPosition(sub.submitted_by, orgNodes), locale);
 
   const approverEntries = getApprovedApprovers(sub).map(({ id, date }) => {
     const p = approvers.find((a) => a.id === id);
     const name = p ? ((locale === "ar" && p.name_ar ? p.name_ar : p.name) ?? id) : id;
-    const positionLabel = formatPositionLabel(resolveOrgPosition(id, orgNodes), departmentFallback, locale);
+    const positionLabel = formatPositionLabel(resolveOrgPosition(id, orgNodes), locale);
     return {
       name,
       positionLabel,

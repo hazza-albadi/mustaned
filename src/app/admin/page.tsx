@@ -4,7 +4,7 @@ import { ROLE_HOME, resolveAdminHome } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/nav/app-shell";
 import { AdminContent } from "@/components/admin/admin-content";
-import type { AdminPermission, Department, FormSubmissionWithRelations, Profile } from "@/types";
+import type { AdminPermission, FormSubmissionWithRelations, Profile } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -24,18 +24,15 @@ export default async function AdminPage() {
 
   const supabase = await createClient();
 
-  // RLS scopes this query automatically: department heads only see rows for
-  // their own department, Super Admin sees everything.
-  const [{ data: submissions }, { data: department }, { data: approverProfiles }] = await Promise.all([
+  // RLS scopes this query automatically: department heads only see
+  // submissions where they're a listed approver, Super Admin sees everything.
+  const [{ data: submissions }, { data: approverProfiles }] = await Promise.all([
     supabase
       .from("form_submissions")
       .select(
-        "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email), department:departments(id,name,name_ar)"
+        "*, form:forms(id,title,title_ar,fields), submitter:profiles!form_submissions_submitted_by_fkey(id,name,name_ar,email)"
       )
       .order("created_at", { ascending: false }),
-    profile.department_id
-      ? supabase.from("departments").select("*").eq("id", profile.department_id).single()
-      : Promise.resolve({ data: null as Department | null }),
     // Directory used to resolve "Approved by" names. Not filtered on
     // is_active — an approver may be deactivated after approving something.
     supabase.from("profiles").select("id, name, name_ar").eq("role", "DEPARTMENT_HEAD"),
@@ -48,11 +45,7 @@ export default async function AdminPage() {
   }));
 
   return (
-    <AppShell
-      profile={profile}
-      departmentName={department ? (department as Department).name : null}
-      permissions={permissions}
-    >
+    <AppShell profile={profile} permissions={permissions}>
       <AdminContent
         submissions={(submissions ?? []) as unknown as FormSubmissionWithRelations[]}
         approverId={profile.id}

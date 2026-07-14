@@ -11,8 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
@@ -63,15 +61,6 @@ export function AnalyticsContent({
   const rejected = filteredSubmissions.filter((s) => s.status === "REJECTED").length;
   const totalFormsCount = selectedFormId === "ALL" ? forms.length : 1;
 
-  const byDepartment = useMemo(() => {
-    const map = new Map<string, number>();
-    filteredSubmissions.forEach((s) => {
-      const name = s.department?.name ?? "Unknown";
-      map.set(name, (map.get(name) ?? 0) + 1);
-    });
-    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
-  }, [filteredSubmissions]);
-
   const byForm = useMemo(() => {
     const map = new Map<string, number>();
     filteredSubmissions.forEach((s) => {
@@ -106,7 +95,6 @@ export function AnalyticsContent({
   function exportExcel() {
     const submissionRows = filteredSubmissions.map((s) => ({
       form: s.form?.title,
-      department: s.department?.name,
       submitted_by: s.submitter?.name,
       status: s.status,
       submitted_at: s.created_at,
@@ -116,20 +104,13 @@ export function AnalyticsContent({
     // One row per approval step (not per submission) — "who approved, from
     // what position, how long it took" only makes sense at that grain.
     const approvalRows = filteredSubmissions.flatMap((s) => {
-      const departmentFallback =
-        (locale === "ar" && s.department?.name_ar ? s.department.name_ar : s.department?.name) ?? null;
-
       return getApprovalSteps(s).map((step) => {
         const approverProfile = profiles.find((p) => p.id === step.approverId);
         const approverName = approverProfile
           ? ((locale === "ar" && approverProfile.name_ar ? approverProfile.name_ar : approverProfile.name) ??
               step.approverId)
           : step.approverId;
-        const positionLabel = formatPositionLabel(
-          resolveOrgPosition(step.approverId, orgNodes),
-          departmentFallback,
-          locale
-        );
+        const positionLabel = formatPositionLabel(resolveOrgPosition(step.approverId, orgNodes), locale);
         const timeTaken =
           step.reachedAt && step.decidedAt
             ? formatDuration(new Date(step.decidedAt).getTime() - new Date(step.reachedAt).getTime())
@@ -200,43 +181,24 @@ export function AnalyticsContent({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Submissions by Department</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={byDepartment}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="name" fontSize={12} />
-                <YAxis fontSize={12} allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill="var(--utas-navy)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Submissions by Form</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie data={byForm} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
-                  {byForm.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Submissions by Form</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie data={byForm} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
+                {byForm.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

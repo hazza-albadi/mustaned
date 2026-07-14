@@ -92,26 +92,17 @@ export const submissionFormSchema = (fields: FormField[], locale: "en" | "ar") =
     data: buildDynamicSchema(fields, locale),
   });
 
-export const departmentSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  name_ar: z.string().min(2, "Arabic name is required"),
-  head_id: z.string().uuid().nullable().optional(),
-  is_active: z.boolean().default(true),
-});
-
 export const userSchema = z.object({
   name: z.string().min(2, "Name is required"),
   name_ar: z.string().optional(),
   email: z.string().email("Invalid email address"),
   role: z.enum(["SUPER_ADMIN", "DEPARTMENT_HEAD", "EMPLOYEE"]),
-  department_id: z.string().uuid().nullable().optional(),
   password: z.string().min(8, "Password must be at least 8 characters").optional(),
 });
 
 export const adminPermissionEnum = z.enum([
   "manage_forms",
   "manage_org_chart",
-  "manage_departments",
   "view_analytics",
   "view_submissions",
 ]);
@@ -191,7 +182,6 @@ export const formBuilderSchema = z.object({
   description: z.string().optional(),
   description_ar: z.string().optional(),
   fields: z.array(formFieldSchema).min(1, "Add at least one field"),
-  allowed_departments: z.array(z.string().uuid()).nullable(),
   // Legacy flat approver list — kept for forms saved before approval_chain
   // existed, no longer editable from the builder UI.
   required_approvers: z.array(z.string()),

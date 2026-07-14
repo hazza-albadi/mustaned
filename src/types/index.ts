@@ -16,7 +16,6 @@ export type Role = "SUPER_ADMIN" | "ADMIN" | "DEPARTMENT_HEAD" | "EMPLOYEE";
 export type AdminPermission =
   | "manage_forms"
   | "manage_org_chart"
-  | "manage_departments"
   | "view_analytics"
   | "view_submissions";
 
@@ -69,23 +68,12 @@ export type FormField = {
   order: number;
 };
 
-export type Department = {
-  id: string;
-  name: string;
-  name_ar: string;
-  head_id: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-};
-
 export type Profile = {
   id: string;
   name: string;
   name_ar: string | null;
   email: string;
   role: Role;
-  department_id: string | null;
   is_active: boolean;
   avatar_url: string | null;
   created_at: string;
@@ -99,7 +87,6 @@ export type FormDefinition = {
   description: string | null;
   description_ar: string | null;
   fields: FormField[];
-  allowed_departments: string[] | null;
   // Legacy flat approver list — kept for forms saved before approval_chain
   // existed. New forms leave this empty and use approval_chain instead.
   required_approvers: string[];
@@ -130,9 +117,6 @@ export type FormSubmission = {
   id: string;
   form_id: string;
   submitted_by: string;
-  // Legacy (pre-org-tree) scaffolding — null for employees whose only
-  // position is an org node, since routing resolves via approval_chain.
-  department_id: string | null;
   data: Record<string, unknown>;
   status: SubmissionStatus;
   approver_id: string | null;
@@ -166,18 +150,11 @@ export type ApprovalChainStep =
 export type FormSubmissionWithRelations = FormSubmission & {
   form?: Pick<FormDefinition, "id" | "title" | "title_ar" | "fields">;
   submitter?: Pick<Profile, "id" | "name" | "name_ar" | "email">;
-  department?: Pick<Department, "id" | "name" | "name_ar">;
 };
 
 export type Database = {
   public: {
     Tables: {
-      departments: {
-        Row: Department;
-        Insert: Partial<Department> & { name: string; name_ar: string };
-        Update: Partial<Department>;
-        Relationships: [];
-      };
       profiles: {
         Row: Profile;
         Insert: Partial<Profile> & { id: string; name: string; email: string; role: Role };

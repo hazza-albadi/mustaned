@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { userSchema } from "@/lib/validations";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAuthUser } from "@/lib/create-auth-user";
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   }
 
-  const { name, name_ar, email, role, department_id, password } = parsed.data;
+  const { name, name_ar, email, role, password } = parsed.data;
 
   // An Admin (as opposed to a Super Admin) may only create Department Head
   // or Employee accounts through this route — never another Admin or Super
@@ -51,16 +51,11 @@ export async function POST(request: Request) {
   const { data: created, error } = await createAuthUser({
     email,
     password,
-    metadata: { name, name_ar, role, department_id },
+    metadata: { name, name_ar, role },
   });
 
   if (error || !created.user) {
     return NextResponse.json({ error: error?.message ?? "Failed to create user" }, { status: 400 });
-  }
-
-  if (role === "DEPARTMENT_HEAD" && department_id) {
-    const admin = createAdminClient();
-    await admin.from("departments").update({ head_id: created.user.id }).eq("id", department_id);
   }
 
   return NextResponse.json({ id: created.user.id }, { status: 201 });

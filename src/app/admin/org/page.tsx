@@ -17,7 +17,7 @@ export default async function OrgPage() {
   ]);
 
   return (
-    <AppShell profile={profile} departmentName={null} permissions={permissions}>
+    <AppShell profile={profile} permissions={permissions}>
       <OrgTreeContent
         nodes={(nodes ?? []) as OrgNode[]}
         profiles={(profiles ?? []) as Profile[]}

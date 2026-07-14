@@ -20,6 +20,6 @@ export async function createAdminAccount({ name, name_ar, email, password }: Cre
     email,
     password,
     email_confirm: true,
-    user_metadata: { name, name_ar: name_ar ?? "", role: "ADMIN", department_id: "" },
+    user_metadata: { name, name_ar: name_ar ?? "", role: "ADMIN" },
   });
 }

@@ -28,7 +28,6 @@
     "noResults": "No results found",
     "name": "Name",
     "email": "Email",
-    "department": "Department",
     "role": "Role",
     "status": "Status",
     "date": "Date",
@@ -73,7 +72,6 @@
     "allSubmissions": "All Submissions",
     "formBuilder": "Form Builder",
     "orgChart": "Org Chart",
-    "departments": "Departments",
     "analytics": "Analytics",
     "admins": "Admins"
   },
@@ -95,14 +93,11 @@
     "viewedAs": "Viewed as"
   },
   "fill": {
-    "step1Title": "Select your department",
-    "step1Subtitle": "Choose the department this request belongs to. This determines who approves it.",
-    "selectDepartment": "Select department",
     "step2Title": "Form details",
     "attachments": "Attachments",
     "submitSuccess": "Your request was submitted successfully",
     "submitError": "Failed to submit your request",
-    "noDepartmentError": "You are not assigned to a department or position. Please contact your administrator.",
+    "noDepartmentError": "You are not assigned to a position. Please contact your administrator.",
     "draftSaved": "Draft saved",
     "continueDraft": "You have a saved draft for this form. Continue where you left off?",
     "discardDraft": "Discard",
@@ -141,7 +136,6 @@
       "view_submissions": "View Submissions",
       "manage_forms": "Manage Forms",
       "manage_org_chart": "Manage Org Chart",
-      "manage_departments": "Manage Departments",
       "view_analytics": "View Analytics"
     }
   },
@@ -164,8 +158,6 @@
     "options": "Options",
     "addOption": "Add option",
     "requiredField": "Required field",
-    "allowedDepartments": "Allowed departments",
-    "allDepartments": "All departments",
     "approvalChain": "Approval Chain",
     "approvalChainHint": "Each step must approve in order, resolved to whoever currently holds that position.",
     "addStep": "Add Step",
@@ -231,15 +223,6 @@
     "empty": "No positions yet. Click \"Add Position\" to build your org chart.",
     "selectPerson": "Select a person",
     "person": "Person"
-  },
-  "departments": {
-    "title": "Departments",
-    "newDepartment": "New Department",
-    "editDepartment": "Edit Department",
-    "nameEn": "Name (English)",
-    "nameAr": "Name (Arabic)",
-    "head": "Department Head",
-    "noHead": "No head assigned"
   },
   "profile": {
     "position": "Position",
