@@ -1,12 +1,15 @@
 /**
- * Seeds Supabase's org_nodes table with the full UTAS administrative
- * structure extracted from the official organizational chart:
+ * Seeds Supabase's org_nodes table with the UTAS administrative structure
+ * extracted from the official organizational chart, scoped to Mustanad's own
+ * branch/college:
  *   University Council -> Vice Chancellor -> Deputy VCs -> Departments -> Sections
- * (plus Internal Audit Department, and the Assistant VC at the Branches /
- * Deans of Specialized Colleges and Academies branch-and-college templates).
+ * (plus Internal Audit Department). The "Assistant Vice Chancellor at the
+ * Branches - Deans of Specialized Colleges and Academies" branch/college
+ * templates were intentionally removed — see migration 0009 — since they
+ * don't apply to this branch/college.
  *
  * Every position below has a fixed UUID (generated once with uuidv4) baked
- * into this file, so re-running the script upserts the same 205 rows by id
+ * into this file, so re-running the script upserts the same rows by id
  * instead of duplicating the tree. No people are assigned — every node is
  * seeded vacant (assigned_profile_id: null) and active.
  *
@@ -83,92 +86,6 @@ const ORG_NODES: OrgNodeSeed[] = [
   { id: "54477b90-c6df-4e80-88aa-db4bf9b63a9d", title: "Institutional Data Analysis Section", parent_id: "f0e0cd39-9d29-44d8-a0f7-1b669c649af0" },
   { id: "7b66d004-3f93-4e85-bdfd-012a29e91dd1", title: "Institutional Accreditation and Proficiency Section", parent_id: "f0e0cd39-9d29-44d8-a0f7-1b669c649af0" },
   { id: "08f50a2c-f6ea-4512-87c3-a3aa75c51580", title: "Programs and Qualifications Listing Section", parent_id: "f0e0cd39-9d29-44d8-a0f7-1b669c649af0" },
-  { id: "89e016a9-bd12-400e-a48d-45e29f9a37d6", title: "Assistant Vice Chancellor at the Branches - Deans of Specialized Colleges and Academies", parent_id: "b6dcceb5-b997-4582-9b0c-9fffc2afc0ea" },
-  { id: "10ae677f-d69f-4134-be5a-c00bb9dd9291", title: "Assistant Vice Chancellor at the Branch", parent_id: "89e016a9-bd12-400e-a48d-45e29f9a37d6" },
-  { id: "7e7a7c58-902b-4849-8264-a1348d09a23b", title: "Public Relations Section", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "c626dfbe-6b92-4b8c-9408-b66f6148383c", title: "Legal Affairs Section", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "6a73182d-d3be-4816-aa35-b84b2f760980", title: "Quality Assurance Section", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "d2eaa107-1624-4f32-9c47-1eb8e83f8760", title: "Mail and Documentation Section", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "4f3767cf-02b6-4792-99a3-d9066061f4f4", title: "Coordination and Follow-up Section", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "e7d01ce6-a708-4f65-975e-85c64446174e", title: "Communication and Media Section", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "05cf52b7-3c52-49c2-ad48-0de5024013dc", title: "University Branch Council", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "504b892d-7b31-45dc-86e9-443b294b8767", title: "Deputy of the Assistant Vice Chancellor for Postgraduate Studies, Scientific Research and Innovation", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "876c9ee0-b7dd-4f3c-a4d8-307ec1fd44bf", title: "Scientific Research Centres", parent_id: "504b892d-7b31-45dc-86e9-443b294b8767" },
-  { id: "174b2963-b6ea-471b-af4e-57104cda02da", title: "Research and Consultation Department", parent_id: "504b892d-7b31-45dc-86e9-443b294b8767" },
-  { id: "e3b2cd26-7d89-4a66-92a4-4b31818a8759", title: "Partnership and Entrepreneurship Section", parent_id: "504b892d-7b31-45dc-86e9-443b294b8767" },
-  { id: "5ff070ff-5fc6-4cc9-ad8c-805c46ac1332", title: "Innovation and Technology Transfer Department", parent_id: "504b892d-7b31-45dc-86e9-443b294b8767" },
-  { id: "b6017d17-a1c6-45ff-b2ad-649509d57b63", title: "Deputy of the Assistant Vice Chancellor for Academic Affairs", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "1b192ae5-1bb9-4bf5-91b3-cdcb53524639", title: "Academic Departments", parent_id: "b6017d17-a1c6-45ff-b2ad-649509d57b63" },
-  { id: "3ba6f4d8-f9b8-48ad-a221-3de712bbb33f", title: "Academic Units", parent_id: "1b192ae5-1bb9-4bf5-91b3-cdcb53524639" },
-  { id: "d8a6bd11-7800-40cf-a599-6cb8cb9ad8e4", title: "Continuous Education and Community Service Department", parent_id: "b6017d17-a1c6-45ff-b2ad-649509d57b63" },
-  { id: "34effd7d-e49b-40ed-b8ac-3828760ca54c", title: "Preparatory Studies Centre", parent_id: "b6017d17-a1c6-45ff-b2ad-649509d57b63" },
-  { id: "be60ba67-9826-46b1-80b7-df6af7ba5a35", title: "English Language Curriculum and Assessment Unit", parent_id: "34effd7d-e49b-40ed-b8ac-3828760ca54c" },
-  { id: "10b5e6c7-4627-430c-917b-c4334bed7230", title: "Mathematics and Computing Skills Curriculum and Assessment Unit", parent_id: "34effd7d-e49b-40ed-b8ac-3828760ca54c" },
-  { id: "9713857f-e340-4dab-a92f-c1ca4b2d78b5", title: "General Requirements Unit", parent_id: "34effd7d-e49b-40ed-b8ac-3828760ca54c" },
-  { id: "edf2de5c-0c68-4ad8-b1c1-e04e18cf5892", title: "Deputy of the Assistant Vice Chancellor for Electronic Systems and Student Services", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "aa5a29bc-073d-4708-b074-eae958a8cacf", title: "Admissions and Registration Centre", parent_id: "edf2de5c-0c68-4ad8-b1c1-e04e18cf5892" },
-  { id: "32f29044-dd3a-49de-8c26-74f20ef8af56", title: "Admissions Section", parent_id: "aa5a29bc-073d-4708-b074-eae958a8cacf" },
-  { id: "67a2afe3-cfaa-4899-9756-0c1cc4180c5c", title: "Registration Section", parent_id: "aa5a29bc-073d-4708-b074-eae958a8cacf" },
-  { id: "48a6ea02-6f43-4f64-8164-b3268bdc3f16", title: "Timetabling and Examination Section", parent_id: "aa5a29bc-073d-4708-b074-eae958a8cacf" },
-  { id: "a2a6b4ee-f28a-4b30-9c51-a17bf263c627", title: "Student Affairs Centre", parent_id: "edf2de5c-0c68-4ad8-b1c1-e04e18cf5892" },
-  { id: "af5d658e-1c58-4a77-b8db-3dca02cd69cb", title: "Student Activities Section", parent_id: "a2a6b4ee-f28a-4b30-9c51-a17bf263c627" },
-  { id: "ac59493b-b19c-465b-a2dc-f32c6dcd7060", title: "Student Services Section", parent_id: "a2a6b4ee-f28a-4b30-9c51-a17bf263c627" },
-  { id: "27cf30ae-4167-4b8c-a808-2c233259c9d7", title: "Guidance and Counselling Section", parent_id: "a2a6b4ee-f28a-4b30-9c51-a17bf263c627" },
-  { id: "27786659-0caa-4853-8edf-d9b20264292b", title: "Training and Career Guidance Centre", parent_id: "edf2de5c-0c68-4ad8-b1c1-e04e18cf5892" },
-  { id: "f25207e3-2731-4c90-ab08-066db6de9384", title: "On-the-Job Training Section", parent_id: "27786659-0caa-4853-8edf-d9b20264292b" },
-  { id: "a093c3c5-ffaa-4021-a954-4d18bbf01762", title: "Career Guidance Section", parent_id: "27786659-0caa-4853-8edf-d9b20264292b" },
-  { id: "c37cb9da-8fc7-4d94-8dee-7409cf504502", title: "Graduate Follow-up Section", parent_id: "27786659-0caa-4853-8edf-d9b20264292b" },
-  { id: "f282bb6e-ac52-4812-aa24-71199d70d54d", title: "Information Systems and Educational Technologies Centre", parent_id: "edf2de5c-0c68-4ad8-b1c1-e04e18cf5892" },
-  { id: "6ce5b38a-4e66-4c9a-8f32-e1307d55ae13", title: "Educational Technologies Section", parent_id: "f282bb6e-ac52-4812-aa24-71199d70d54d" },
-  { id: "0b203a5c-1b83-4ea7-82aa-4f355542e070", title: "Networks and Information Security Section", parent_id: "f282bb6e-ac52-4812-aa24-71199d70d54d" },
-  { id: "a4e53a4e-b09e-453e-9780-909206aac6ea", title: "Library Section", parent_id: "f282bb6e-ac52-4812-aa24-71199d70d54d" },
-  { id: "41246a06-1659-4c27-8570-e122902f442b", title: "Systems Development and Technical Support Section", parent_id: "f282bb6e-ac52-4812-aa24-71199d70d54d" },
-  { id: "c374ff72-8300-4588-8ce0-ffc6a808b390", title: "Administrative and Financial Affairs Department", parent_id: "10ae677f-d69f-4134-be5a-c00bb9dd9291" },
-  { id: "2feaacfc-c05b-4260-a9c7-08bb38d03ec3", title: "Administrative Affairs Section", parent_id: "c374ff72-8300-4588-8ce0-ffc6a808b390" },
-  { id: "9cac5be6-26cc-43da-bdca-ce20a4ba7bde", title: "Financial Affairs Section", parent_id: "c374ff72-8300-4588-8ce0-ffc6a808b390" },
-  { id: "b9188267-173e-4531-adfe-63d2d2a34f02", title: "Human Resources Section", parent_id: "c374ff72-8300-4588-8ce0-ffc6a808b390" },
-  { id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d", title: "Dean of Specialized College / Academy", parent_id: "89e016a9-bd12-400e-a48d-45e29f9a37d6" },
-  { id: "c7470ef3-5c2e-400b-85de-63b83bf9f95d", title: "Public Relations Section", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "04f0d782-481d-411d-a6b8-28d961a44046", title: "Legal Affairs Section", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "86043d2a-4789-44d6-8be8-2c634c65b96c", title: "Quality Assurance Section", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "18178e8f-46f0-4e85-8799-855b49b355db", title: "Mail and Documentation Section", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "af9fc625-847d-4574-9d81-911bc51951be", title: "Coordination and Follow-up Section", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "7bbafb97-e35b-4419-bf75-59e6f6f117b9", title: "Communication and Media Section", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "1d1b67a2-60d9-4af9-b332-16dcfaa879bb", title: "Specialized College/Academy Council", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "a88e227c-cada-4ea2-bab3-074a2695d588", title: "Assistant Dean for Academic Affairs and Scientific Research", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "e2354770-c945-4b8f-a513-f376ed711116", title: "Preparatory Studies Centre", parent_id: "a88e227c-cada-4ea2-bab3-074a2695d588" },
-  { id: "fcc321c4-3a9b-4931-8d30-e28d4424c5e0", title: "English Language Curriculum and Assessment Unit", parent_id: "e2354770-c945-4b8f-a513-f376ed711116" },
-  { id: "c15062c8-4b5b-4089-a04e-d080bdef8c0c", title: "Mathematics and Computing Skills Curriculum and Assessment Unit", parent_id: "e2354770-c945-4b8f-a513-f376ed711116" },
-  { id: "ce3f5c51-3694-4876-abf4-e7935d5bb332", title: "General Requirements Unit", parent_id: "e2354770-c945-4b8f-a513-f376ed711116" },
-  { id: "fea31eb5-2d3f-47a5-a9b2-0e39c8790cf5", title: "Partnership and Entrepreneurship Section", parent_id: "a88e227c-cada-4ea2-bab3-074a2695d588" },
-  { id: "e601f9d0-4789-4673-a9fc-75913e0af90d", title: "Innovation and Technology Transfer Department", parent_id: "a88e227c-cada-4ea2-bab3-074a2695d588" },
-  { id: "a4431b77-7308-402e-a7db-00bcc2b74212", title: "Scientific Research Centres", parent_id: "a88e227c-cada-4ea2-bab3-074a2695d588" },
-  { id: "83bcb383-1629-41f5-a1ea-0555ff61a3fa", title: "Academic Departments", parent_id: "a88e227c-cada-4ea2-bab3-074a2695d588" },
-  { id: "b4a1fcf3-1d44-40aa-9751-47f0cb2ae3c2", title: "Academic Units", parent_id: "83bcb383-1629-41f5-a1ea-0555ff61a3fa" },
-  { id: "03f25ddb-d7fd-4bca-bd41-5bd9e8469727", title: "Continuous Education and Community Service Department", parent_id: "a88e227c-cada-4ea2-bab3-074a2695d588" },
-  { id: "2a65f623-6fb3-487b-b3fc-07b635de3d3a", title: "Research and Consultation Department", parent_id: "a88e227c-cada-4ea2-bab3-074a2695d588" },
-  { id: "222eb413-aee3-4590-a8b1-6bdad5ebce6a", title: "Assistant Dean for Electronic Systems and Student Services", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "7f1ffab0-95ee-4b90-bd74-90faa9832c6c", title: "Admissions and Registration Centre", parent_id: "222eb413-aee3-4590-a8b1-6bdad5ebce6a" },
-  { id: "2316f29b-8183-4adc-8172-897374b5072c", title: "Admissions Section", parent_id: "7f1ffab0-95ee-4b90-bd74-90faa9832c6c" },
-  { id: "d58e420e-9bac-4c02-808d-736db31cca2d", title: "Registration Section", parent_id: "7f1ffab0-95ee-4b90-bd74-90faa9832c6c" },
-  { id: "e3dc6deb-db70-43f5-bcfc-956b42eebe32", title: "Timetabling and Examination Section", parent_id: "7f1ffab0-95ee-4b90-bd74-90faa9832c6c" },
-  { id: "09d5507b-3339-427c-ba43-470e3b9ef648", title: "Student Affairs Centre", parent_id: "222eb413-aee3-4590-a8b1-6bdad5ebce6a" },
-  { id: "dc37acbd-14cb-4a73-868d-37e0e0c0c907", title: "Student Activities Section", parent_id: "09d5507b-3339-427c-ba43-470e3b9ef648" },
-  { id: "44a2de0c-bb46-4e9a-aead-4ec0280c022d", title: "Student Services Section", parent_id: "09d5507b-3339-427c-ba43-470e3b9ef648" },
-  { id: "65487b15-712b-4f4f-8c3a-8968c9262520", title: "Guidance and Counselling Section", parent_id: "09d5507b-3339-427c-ba43-470e3b9ef648" },
-  { id: "0e620e84-306f-4335-a53b-98ebc9c59bfa", title: "Training and Career Guidance Centre", parent_id: "222eb413-aee3-4590-a8b1-6bdad5ebce6a" },
-  { id: "21651aeb-6ed5-4da2-a6b1-b88c36a0a336", title: "On-the-Job Training Section", parent_id: "0e620e84-306f-4335-a53b-98ebc9c59bfa" },
-  { id: "a81d1ff7-984b-4055-8cac-040991eb4556", title: "Career Guidance Section", parent_id: "0e620e84-306f-4335-a53b-98ebc9c59bfa" },
-  { id: "3139dba1-ac45-4598-9470-855ac4d5bbf9", title: "Graduate Follow-up Section", parent_id: "0e620e84-306f-4335-a53b-98ebc9c59bfa" },
-  { id: "8d482de2-ad50-4cd7-b2d6-41a58f2cc966", title: "Information Systems and Educational Technologies Centre", parent_id: "222eb413-aee3-4590-a8b1-6bdad5ebce6a" },
-  { id: "beb94f24-9fbb-4484-b8da-b548818aca72", title: "Educational Technologies Section", parent_id: "8d482de2-ad50-4cd7-b2d6-41a58f2cc966" },
-  { id: "0c52d0ad-bc3d-439a-9342-ed684e165e19", title: "Networks and Information Security Section", parent_id: "8d482de2-ad50-4cd7-b2d6-41a58f2cc966" },
-  { id: "e3806ba5-410f-4500-9ec7-cf2b6743bb65", title: "Library Section", parent_id: "8d482de2-ad50-4cd7-b2d6-41a58f2cc966" },
-  { id: "2018278c-1daa-42ad-891e-2e5f02e624c5", title: "Systems Development and Technical Support Section", parent_id: "8d482de2-ad50-4cd7-b2d6-41a58f2cc966" },
-  { id: "ca3b1503-4d0e-4105-a572-a91d294160cc", title: "Administrative and Financial Affairs Department", parent_id: "bf45001c-4d68-445c-8ca0-fb81f0bf423d" },
-  { id: "f486b0fc-bf0f-48d5-af9e-a74c4a404e38", title: "Administrative Affairs Section", parent_id: "ca3b1503-4d0e-4105-a572-a91d294160cc" },
-  { id: "61d6e8da-06b5-43c9-b826-9b9f64a02dc4", title: "Financial Affairs Section", parent_id: "ca3b1503-4d0e-4105-a572-a91d294160cc" },
-  { id: "88913d07-ac17-40b3-9ad9-5bd4e4a79132", title: "Human Resources Section", parent_id: "ca3b1503-4d0e-4105-a572-a91d294160cc" },
   { id: "d494779b-97ab-4bc6-98b6-43e76e42debf", title: "Deputy Vice Chancellor for Administrative and Financial Affairs", parent_id: "b6dcceb5-b997-4582-9b0c-9fffc2afc0ea" },
   { id: "03788c08-6b93-49a6-afec-afd704e70018", title: "Coordination and Follow-up Section", parent_id: "d494779b-97ab-4bc6-98b6-43e76e42debf" },
   { id: "2943858c-b090-42de-9b6b-e22fcaa11653", title: "Financial Affairs Department", parent_id: "d494779b-97ab-4bc6-98b6-43e76e42debf" },
