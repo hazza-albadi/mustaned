@@ -72,6 +72,7 @@
     "allSubmissions": "جميع الطلبات",
     "formBuilder": "منشئ النماذج",
     "orgChart": "الهيكل التنظيمي",
+    "filters": "التصنيفات",
     "analytics": "التحليلات",
     "admins": "المسؤولون"
   },
@@ -90,7 +91,9 @@
     "rejected": "مرفوضة",
     "noForms": "لا توجد نماذج متاحة حالياً.",
     "fillForm": "تعبئة النموذج",
-    "viewedAs": "معروض كـ"
+    "viewedAs": "معروض كـ",
+    "allCategories": "جميع التصنيفات",
+    "noFormsInCategory": "لا توجد نماذج في هذا التصنيف."
   },
   "fill": {
     "step2Title": "تفاصيل النموذج",
@@ -136,6 +139,7 @@
       "view_submissions": "عرض الطلبات",
       "manage_forms": "إدارة النماذج",
       "manage_org_chart": "إدارة الهيكل التنظيمي",
+      "manage_filters": "إدارة التصنيفات",
       "view_analytics": "عرض التحليلات"
     }
   },
@@ -158,6 +162,8 @@
     "options": "الخيارات",
     "addOption": "إضافة خيار",
     "requiredField": "حقل مطلوب",
+    "filters": "التصنيفات",
+    "noFiltersAvailable": "لا توجد تصنيفات متاحة",
     "requiresApproval": "يتطلب موافقة",
     "requiresComment": "يتطلب تعليقاً عند الرفض",
     "saveForm": "حفظ النموذج",
@@ -190,6 +196,13 @@
     "position": "المنصب",
     "orgPath": "المسار التنظيمي",
     "role": "الصلاحية"
+  },
+  "filters": {
+    "title": "التصنيفات",
+    "newFilter": "تصنيف جديد",
+    "editFilter": "تعديل التصنيف",
+    "nameEn": "الاسم (إنجليزي)",
+    "nameAr": "الاسم (عربي)"
   },
   "errors": {
     "notFound": "الصفحة غير موجودة",

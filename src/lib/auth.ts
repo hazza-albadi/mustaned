@@ -38,7 +38,7 @@ export async function getAdminPermissions(profileId: string): Promise<AdminPermi
   return (data ?? []).map((row) => row.permission);
 }
 
-// Gate for the three permission-mapped /admin pages (builder, org,
+// Gate for the four permission-mapped /admin pages (builder, org, filters,
 // analytics). SUPER_ADMIN always passes. An ADMIN passes only
 // if they hold the specific permission; otherwise they're sent to whichever
 // admin page they *do* have access to (or the no-access page), never back to

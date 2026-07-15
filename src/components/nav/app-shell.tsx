@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   FileEdit,
   Network,
+  Tag,
   BarChart3,
   ShieldCheck,
   LogOut,
@@ -49,6 +50,7 @@ const NAV_ITEMS_BY_ROLE: Record<Exclude<Profile["role"], "ADMIN">, NavItem[]> = 
     { href: "/admin", icon: ClipboardCheck, labelKey: "nav.allSubmissions" },
     { href: "/admin/builder", icon: FileEdit, labelKey: "nav.formBuilder" },
     { href: "/admin/org", icon: Network, labelKey: "nav.orgChart" },
+    { href: "/admin/filters", icon: Tag, labelKey: "nav.filters" },
     { href: "/admin/analytics", icon: BarChart3, labelKey: "nav.analytics" },
     { href: "/admin/admins", icon: ShieldCheck, labelKey: "nav.admins" },
   ],
@@ -58,6 +60,7 @@ const ADMIN_PERMISSION_NAV: Record<AdminPermission, NavItem> = {
   view_submissions: { href: "/admin", icon: ClipboardCheck, labelKey: "nav.allSubmissions" },
   manage_forms: { href: "/admin/builder", icon: FileEdit, labelKey: "nav.formBuilder" },
   manage_org_chart: { href: "/admin/org", icon: Network, labelKey: "nav.orgChart" },
+  manage_filters: { href: "/admin/filters", icon: Tag, labelKey: "nav.filters" },
   view_analytics: { href: "/admin/analytics", icon: BarChart3, labelKey: "nav.analytics" },
 };
 

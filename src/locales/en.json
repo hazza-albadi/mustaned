@@ -72,6 +72,7 @@
     "allSubmissions": "All Submissions",
     "formBuilder": "Form Builder",
     "orgChart": "Org Chart",
+    "filters": "Filters",
     "analytics": "Analytics",
     "admins": "Admins"
   },
@@ -90,7 +91,9 @@
     "rejected": "Rejected",
     "noForms": "No forms are available right now.",
     "fillForm": "Fill Form",
-    "viewedAs": "Viewed as"
+    "viewedAs": "Viewed as",
+    "allCategories": "All categories",
+    "noFormsInCategory": "No forms in this category."
   },
   "fill": {
     "step2Title": "Form details",
@@ -136,6 +139,7 @@
       "view_submissions": "View Submissions",
       "manage_forms": "Manage Forms",
       "manage_org_chart": "Manage Org Chart",
+      "manage_filters": "Manage Filters",
       "view_analytics": "View Analytics"
     }
   },
@@ -158,6 +162,8 @@
     "options": "Options",
     "addOption": "Add option",
     "requiredField": "Required field",
+    "filters": "Filters",
+    "noFiltersAvailable": "No filters available",
     "approvalChain": "Approval Chain",
     "approvalChainHint": "Each step must approve in order, resolved to whoever currently holds that position.",
     "addStep": "Add Step",
@@ -228,6 +234,13 @@
     "position": "Position",
     "orgPath": "Org path",
     "role": "Role"
+  },
+  "filters": {
+    "title": "Filters",
+    "newFilter": "New Filter",
+    "editFilter": "Edit Filter",
+    "nameEn": "Name (English)",
+    "nameAr": "Name (Arabic)"
   },
   "errors": {
     "notFound": "Page not found",

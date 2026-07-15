@@ -3,7 +3,7 @@ import { requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/nav/app-shell";
 import { FormBuilder } from "@/components/builder/form-builder";
-import type { FormDefinition, OrgNode } from "@/types";
+import type { Filter, FormDefinition, OrgNode } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,10 @@ export default async function BuilderEditPage({
   const { profile, permissions } = await requirePermission("manage_forms");
   const supabase = await createClient();
 
-  const { data: orgNodes } = await supabase.from("org_nodes").select("*").eq("is_active", true).order("title");
+  const [{ data: orgNodes }, { data: filters }] = await Promise.all([
+    supabase.from("org_nodes").select("*").eq("is_active", true).order("title"),
+    supabase.from("filters").select("*").eq("is_active", true).order("name"),
+  ]);
 
   let initialForm: FormDefinition | null = null;
 
@@ -31,6 +34,7 @@ export default async function BuilderEditPage({
       <FormBuilder
         initialForm={initialForm}
         orgNodes={(orgNodes ?? []) as OrgNode[]}
+        filters={(filters ?? []) as Filter[]}
         userId={profile.id}
       />
     </AppShell>

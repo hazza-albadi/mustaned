@@ -17,7 +17,8 @@ export type AdminPermission =
   | "manage_forms"
   | "manage_org_chart"
   | "view_analytics"
-  | "view_submissions";
+  | "view_submissions"
+  | "manage_filters";
 
 export type AdminPermissionRow = {
   id: string;
@@ -68,6 +69,19 @@ export type FormField = {
   order: number;
 };
 
+// Purely a display/sort categorization tag on forms (e.g. branch or
+// location) — no access-control meaning, unlike the removed departments
+// feature. A form can belong to several (forms.filter_ids); used to narrow
+// the "Available Forms" listing, not stored on individual submissions.
+export type Filter = {
+  id: string;
+  name: string;
+  name_ar: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Profile = {
   id: string;
   name: string;
@@ -87,6 +101,10 @@ export type FormDefinition = {
   description: string | null;
   description_ar: string | null;
   fields: FormField[];
+  // Category tags this form belongs to, used to narrow the "Available
+  // Forms" listing. Display/sort categorization only — no access-control
+  // meaning.
+  filter_ids: string[];
   // Legacy flat approver list — kept for forms saved before approval_chain
   // existed. New forms leave this empty and use approval_chain instead.
   required_approvers: string[];
@@ -187,6 +205,12 @@ export type Database = {
         Row: AdminPermissionRow;
         Insert: Partial<AdminPermissionRow> & { profile_id: string; permission: AdminPermission };
         Update: Partial<AdminPermissionRow>;
+        Relationships: [];
+      };
+      filters: {
+        Row: Filter;
+        Insert: Partial<Filter> & { name: string; name_ar: string };
+        Update: Partial<Filter>;
         Relationships: [];
       };
     };

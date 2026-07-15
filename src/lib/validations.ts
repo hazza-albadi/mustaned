@@ -105,7 +105,14 @@ export const adminPermissionEnum = z.enum([
   "manage_org_chart",
   "view_analytics",
   "view_submissions",
+  "manage_filters",
 ]);
+
+export const filterSchema = z.object({
+  name: z.string().min(2, "Name is required"),
+  name_ar: z.string().min(2, "Arabic name is required"),
+  is_active: z.boolean().default(true),
+});
 
 export const adminAccountSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -182,6 +189,7 @@ export const formBuilderSchema = z.object({
   description: z.string().optional(),
   description_ar: z.string().optional(),
   fields: z.array(formFieldSchema).min(1, "Add at least one field"),
+  filter_ids: z.array(z.string().uuid()),
   // Legacy flat approver list — kept for forms saved before approval_chain
   // existed, no longer editable from the builder UI.
   required_approvers: z.array(z.string()),

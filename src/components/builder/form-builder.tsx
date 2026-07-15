@@ -32,8 +32,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { ApprovalChainStep, FieldType, FormDefinition, FormField, OrgNode } from "@/types";
+import type { ApprovalChainStep, FieldType, Filter, FormDefinition, FormField, OrgNode } from "@/types";
 import { Eye, Save, Archive, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -69,10 +70,12 @@ function CanvasDropArea({
 export function FormBuilder({
   initialForm,
   orgNodes,
+  filters,
   userId,
 }: {
   initialForm: FormDefinition | null;
   orgNodes: OrgNode[];
+  filters: Filter[];
   userId: string;
 }) {
   const { t, locale } = useI18n();
@@ -84,6 +87,7 @@ export function FormBuilder({
   const [description, setDescription] = useState(initialForm?.description ?? "");
   const [descriptionAr, setDescriptionAr] = useState(initialForm?.description_ar ?? "");
   const [fields, setFields] = useState<FormField[]>(initialForm?.fields ?? []);
+  const [filterIds, setFilterIds] = useState<string[]>(initialForm?.filter_ids ?? []);
   // Legacy flat approver list — preserved as-is on save (no longer editable
   // from this UI); required only so old forms aren't silently wiped when
   // re-saved through the builder.
@@ -151,6 +155,10 @@ export function FormBuilder({
     if (selectedFieldId === id) setSelectedFieldId(null);
   }
 
+  function toggleFilter(filterId: string) {
+    setFilterIds((prev) => (prev.includes(filterId) ? prev.filter((id) => id !== filterId) : [...prev, filterId]));
+  }
+
   async function persist(publish: boolean) {
     const payload = {
       title,
@@ -158,6 +166,7 @@ export function FormBuilder({
       description,
       description_ar: descriptionAr,
       fields: renumbered(sortedFields),
+      filter_ids: filterIds,
       required_approvers: requiredApprovers,
       approval_chain: approvalChain,
       requires_approval: requiresApproval,
@@ -253,6 +262,21 @@ export function FormBuilder({
           <div className="space-y-2">
             <Label>{t("builder.descriptionAr")}</Label>
             <Textarea value={descriptionAr} onChange={(e) => setDescriptionAr(e.target.value)} dir="rtl" />
+          </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label>{t("builder.filters")}</Label>
+            <div className="flex flex-wrap gap-3">
+              {filters.length === 0 && (
+                <p className="text-sm text-muted-foreground">{t("builder.noFiltersAvailable")}</p>
+              )}
+              {filters.map((f) => (
+                <label key={f.id} className="flex items-center gap-2 text-sm">
+                  <Checkbox checked={filterIds.includes(f.id)} onCheckedChange={() => toggleFilter(f.id)} />
+                  {locale === "ar" ? f.name_ar : f.name}
+                </label>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-3 sm:col-span-2">
