@@ -10,6 +10,10 @@
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
+// S-02: createAuthUser() only hands out the fixed SEED_USER_PASSWORD when
+// explicitly opted into via SEED_MODE — this script is the one legitimate
+// caller that wants that (demo accounts with a known, documented password).
+process.env.SEED_MODE = "true";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 import type { FormField } from "../src/types";

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { orgNodeSchema } from "@/lib/validations";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 // Super Admin always passes; an Admin passes only with manage_org_chart.
 // RLS on org_nodes (0007_admin_permissions.sql) enforces the same rule again
@@ -27,7 +27,7 @@ async function requireOrgChartAccess() {
 }
 
 export async function POST(request: Request) {
-  if (!rateLimit(`org-nodes:create:${getClientIp(request)}`, 30, 60_000)) {
+  if (!(await rateLimitAsync(`org-nodes:create:${getClientIp(request)}`, 30, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 

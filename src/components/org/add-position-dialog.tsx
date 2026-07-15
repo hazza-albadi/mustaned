@@ -69,7 +69,10 @@ export function AddPositionDialog({
     try {
       // A brand-new position has no children yet, so a newly created
       // person here always starts as an EMPLOYEE (see assign-person.ts).
-      const assignedProfileId = await resolveAssignedProfileId(assignValue, false);
+      const { profileId: assignedProfileId, generatedPassword } = await resolveAssignedProfileId(
+        assignValue,
+        false
+      );
       const res = await fetch("/api/org-nodes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -82,7 +85,14 @@ export function AddPositionDialog({
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error ?? "Failed to create position");
 
-      toast.success(t("common.success"));
+      if (generatedPassword) {
+        toast.success(t("common.success"), {
+          description: `${t("org.generatedPasswordNotice", "One-time password for the new account:")} ${generatedPassword}`,
+          duration: 30000,
+        });
+      } else {
+        toast.success(t("common.success"));
+      }
       reset();
       onOpenChange(false);
       router.refresh();

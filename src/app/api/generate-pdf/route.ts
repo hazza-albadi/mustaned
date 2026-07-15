@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import { resolveSubmissionFields } from "@/lib/submission-fields";
 import { getApprovedApprovers } from "@/lib/approver-summary";
 import { resolveOrgPosition, formatPositionLabel, type OrgNodeLite } from "@/lib/org-position";
@@ -14,7 +14,7 @@ import type { FormSubmissionWithRelations, Profile } from "@/types";
 // fs access for the logo and has no CSP/Worker restrictions to work around —
 // this route replaces the old client-side generation entirely.
 export async function POST(request: Request) {
-  if (!rateLimit(`generate-pdf:${getClientIp(request)}`, 20, 60_000)) {
+  if (!(await rateLimitAsync(`generate-pdf:${getClientIp(request)}`, 20, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 

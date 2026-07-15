@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { userSchema } from "@/lib/validations";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import { createAuthUser } from "@/lib/create-auth-user";
 
 export async function POST(request: Request) {
-  if (!rateLimit(`users:create:${getClientIp(request)}`, 20, 60_000)) {
+  if (!(await rateLimitAsync(`users:create:${getClientIp(request)}`, 20, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { data: created, error } = await createAuthUser({
+  const { data: created, error, generatedPassword } = await createAuthUser({
     email,
     password,
     metadata: { name, name_ar, role },
@@ -58,5 +58,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error?.message ?? "Failed to create user" }, { status: 400 });
   }
 
-  return NextResponse.json({ id: created.user.id }, { status: 201 });
+  return NextResponse.json({ id: created.user.id, generatedPassword }, { status: 201 });
 }

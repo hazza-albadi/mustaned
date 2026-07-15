@@ -57,7 +57,16 @@
     "password": "كلمة المرور",
     "loggingIn": "جارٍ تسجيل الدخول...",
     "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-    "welcomeBack": "مرحباً بعودتك"
+    "welcomeBack": "مرحباً بعودتك",
+    "mfaEnterCode": "أدخل الرمز المكون من 6 أرقام",
+    "mfaInvalidCode": "رمز غير صحيح",
+    "mfaSectionTitle": "المصادقة الثنائية",
+    "mfaOn": "مفعّلة",
+    "mfaEnable": "تفعيل المصادقة الثنائية",
+    "mfaDisable": "تعطيل",
+    "mfaEnabled": "تم تفعيل المصادقة الثنائية",
+    "mfaDisabled": "تم تعطيل المصادقة الثنائية",
+    "mfaManualEntry": "أو أدخل يدوياً"
   },
   "roles": {
     "SUPER_ADMIN": "مدير عام",

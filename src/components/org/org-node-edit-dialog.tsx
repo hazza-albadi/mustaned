@@ -144,7 +144,7 @@ export function OrgNodeEditDialog({
     setBusy(true);
     try {
       const hasChildren = allNodes.some((n) => n.parent_id === node!.id && n.is_active);
-      const profileId = await resolveAssignedProfileId(assignValue, hasChildren);
+      const { profileId, generatedPassword } = await resolveAssignedProfileId(assignValue, hasChildren);
       if (!profileId) {
         toast.error(t("common.error"));
         return;
@@ -156,7 +156,14 @@ export function OrgNodeEditDialog({
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error ?? t("common.error"));
-      toast.success(t("common.success"));
+      if (generatedPassword) {
+        toast.success(t("common.success"), {
+          description: `${t("org.generatedPasswordNotice", "One-time password for the new account:")} ${generatedPassword}`,
+          duration: 30000,
+        });
+      } else {
+        toast.success(t("common.success"));
+      }
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("common.error"));

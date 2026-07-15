@@ -92,12 +92,27 @@ export const submissionFormSchema = (fields: FormField[], locale: "en" | "ar") =
     data: buildDynamicSchema(fields, locale),
   });
 
+// S-09: length alone (the previous `min(8)`-only rule) doesn't rule out
+// "password1" or "aaaaaaaa". Require at least one lowercase, one uppercase,
+// one digit, and one symbol — applied to every account this app issues a
+// password for, including SUPER_ADMIN (created via userSchema) and ADMIN
+// (adminAccountSchema below), the two roles where a weak password matters
+// most since they carry the broadest RLS bypass.
+const passwordComplexity = z
+  .string()
+  .min(10, "Password must be at least 10 characters")
+  .max(128, "Password must be at most 128 characters")
+  .regex(/[a-z]/, "Password must contain a lowercase letter")
+  .regex(/[A-Z]/, "Password must contain an uppercase letter")
+  .regex(/[0-9]/, "Password must contain a number")
+  .regex(/[^a-zA-Z0-9]/, "Password must contain a symbol");
+
 export const userSchema = z.object({
   name: z.string().min(2, "Name is required"),
   name_ar: z.string().optional(),
   email: z.string().email("Invalid email address"),
   role: z.enum(["SUPER_ADMIN", "DEPARTMENT_HEAD", "EMPLOYEE"]),
-  password: z.string().min(8, "Password must be at least 8 characters").optional(),
+  password: passwordComplexity.optional(),
 });
 
 export const adminPermissionEnum = z.enum([
@@ -120,7 +135,7 @@ export const adminAccountSchema = z.object({
   email: z.string().email("Invalid email address"),
   // Real password, chosen directly by the Super Admin — required, no
   // auto-generation (this is not a test account).
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: passwordComplexity,
   permissions: z.array(adminPermissionEnum),
 });
 

@@ -20,13 +20,27 @@
 .DS_Store
 *.pem
 
+# S-11: ad-hoc data exports (org chart, user lists, etc.) contain real
+# organizational/PII data and must never be committed — regenerate on demand
+# instead of keeping them in the tree.
+/exports/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 # local env files
+# S-10: previously only .env*.local was excluded — Next.js also loads plain
+# .env / .env.production / .env.development, none of which were covered, so
+# creating one of those (a common developer habit) risked committing real
+# Supabase keys. .env.example is the one intentional exception.
+.env
+.env.local
+.env.production
+.env.development
 .env*.local
+!.env.example
 
 # vercel
 .vercel

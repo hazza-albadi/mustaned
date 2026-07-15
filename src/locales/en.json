@@ -57,7 +57,16 @@
     "password": "Password",
     "loggingIn": "Signing in...",
     "invalidCredentials": "Invalid email or password",
-    "welcomeBack": "Welcome back"
+    "welcomeBack": "Welcome back",
+    "mfaEnterCode": "Enter the 6-digit code",
+    "mfaInvalidCode": "Invalid code",
+    "mfaSectionTitle": "Two-factor authentication",
+    "mfaOn": "Enabled",
+    "mfaEnable": "Enable two-factor authentication",
+    "mfaDisable": "Disable",
+    "mfaEnabled": "Two-factor authentication enabled",
+    "mfaDisabled": "Two-factor authentication disabled",
+    "mfaManualEntry": "Or enter manually"
   },
   "roles": {
     "SUPER_ADMIN": "Super Admin",
@@ -228,7 +237,8 @@
     "vacantSuffix": "position(s) are currently vacant",
     "empty": "No positions yet. Click \"Add Position\" to build your org chart.",
     "selectPerson": "Select a person",
-    "person": "Person"
+    "person": "Person",
+    "generatedPasswordNotice": "One-time password for the new account:"
   },
   "profile": {
     "position": "Position",

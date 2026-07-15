@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminAccount } from "@/lib/create-admin-account";
 import { adminAccountSchema } from "@/lib/validations";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 // Always exactly SUPER_ADMIN — creating Admin accounts is never delegated,
 // so there's no ADMIN/permission branch here at all, unlike the org-chart
@@ -18,7 +18,7 @@ async function requireSuperAdmin() {
 }
 
 export async function POST(request: Request) {
-  if (!rateLimit(`admin-accounts:create:${getClientIp(request)}`, 10, 60_000)) {
+  if (!(await rateLimitAsync(`admin-accounts:create:${getClientIp(request)}`, 10, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 

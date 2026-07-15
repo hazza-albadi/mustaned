@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { userSchema } from "@/lib/validations";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 // Super Admin always passes; an Admin passes only with manage_org_chart. This
 // route uses the service-role client for auth.admin.*/profiles writes, which
@@ -29,7 +29,7 @@ async function requireOrgChartAccess() {
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!rateLimit(`users:update:${getClientIp(request)}`, 30, 60_000)) {
+  if (!(await rateLimitAsync(`users:update:${getClientIp(request)}`, 30, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
@@ -79,7 +79,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!rateLimit(`users:delete:${getClientIp(request)}`, 20, 60_000)) {
+  if (!(await rateLimitAsync(`users:delete:${getClientIp(request)}`, 20, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 

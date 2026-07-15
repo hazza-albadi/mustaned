@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ADMIN_PERMISSION_OPTIONS } from "@/lib/admin-permission-options";
+import { MfaEnrollPanel } from "@/components/auth/mfa-enroll-panel";
 import type { AdminPermission, Profile } from "@/types";
 
 interface OrgPositionInfo {
@@ -140,6 +141,8 @@ export function ProfileChip({
             )}
           </div>
         )}
+
+        {(profile.role === "SUPER_ADMIN" || profile.role === "ADMIN") && <MfaEnrollPanel />}
       </PopoverContent>
     </Popover>
   );

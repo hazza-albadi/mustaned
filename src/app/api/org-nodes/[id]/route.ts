@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { orgNodeSchema } from "@/lib/validations";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import type { OrgNode } from "@/types";
 
 // Super Admin always passes; an Admin passes only with manage_org_chart.
@@ -57,7 +57,7 @@ async function wouldCreateCycle(
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!rateLimit(`org-nodes:update:${getClientIp(request)}`, 60, 60_000)) {
+  if (!(await rateLimitAsync(`org-nodes:update:${getClientIp(request)}`, 60, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
@@ -114,7 +114,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!rateLimit(`org-nodes:delete:${getClientIp(request)}`, 30, 60_000)) {
+  if (!(await rateLimitAsync(`org-nodes:delete:${getClientIp(request)}`, 30, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 

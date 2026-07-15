@@ -92,7 +92,7 @@ export function AnalyticsContent({
     return Math.round((totalHours / resolved.length) * 10) / 10;
   }, [filteredSubmissions]);
 
-  function exportExcel() {
+  async function exportExcel() {
     const submissionRows = filteredSubmissions.map((s) => ({
       form: s.form?.title,
       submitted_by: s.submitter?.name,
@@ -131,7 +131,7 @@ export function AnalyticsContent({
       });
     });
 
-    downloadXlsx(`analytics-${format(new Date(), "yyyy-MM-dd")}.xlsx`, [
+    await downloadXlsx(`analytics-${format(new Date(), "yyyy-MM-dd")}.xlsx`, [
       { name: "Submissions", rows: submissionRows },
       { name: "Approvals", rows: approvalRows },
     ]);

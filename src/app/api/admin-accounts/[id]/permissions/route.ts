@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { adminPermissionsUpdateSchema } from "@/lib/validations";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 
 async function requireSuperAdmin() {
   const supabase = await createClient();
@@ -16,7 +16,7 @@ async function requireSuperAdmin() {
 // Replaces the full permission set for an Admin account (add + revoke in one
 // call) rather than a piecemeal add/remove API.
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!rateLimit(`admin-accounts:permissions:${getClientIp(request)}`, 30, 60_000)) {
+  if (!(await rateLimitAsync(`admin-accounts:permissions:${getClientIp(request)}`, 30, 60_000))) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
