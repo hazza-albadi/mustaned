@@ -5,11 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
-import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/config";
 import { submissionFormSchema } from "@/lib/validations";
 import { isDisplayField } from "@/lib/form-fields";
-import { resolveApprovalChain, resolveLegacyRequiredApprovers } from "@/lib/approval-chain";
 import { FieldRenderer } from "@/components/forms/field-renderer";
 import { FileUpload } from "@/components/forms/file-upload";
 import { Button } from "@/components/ui/button";
@@ -48,7 +46,6 @@ export function DynamicFormRenderer({
 }) {
   const { locale, t } = useI18n();
   const router = useRouter();
-  const supabase = createClient();
   const sortedFields = useMemo(() => [...form.fields].sort((a, b) => a.order - b.order), [form.fields]);
   const draftKey = `draft:${form.id}:${userId}`;
   const draftIdRef = useRef(uuidv4());
@@ -124,42 +121,22 @@ export function DynamicFormRenderer({
     if (!hasRouting) return;
     setSubmitting(true);
     try {
-      // Resolve the approval chain to whoever currently holds each position
-      // before building per-approver entries, so routing always reflects who
-      // holds that role today rather than who held it when the form was
-      // designed. Forms saved before approval_chain existed fall back to
-      // their flat required_approvers list.
-      let resolvedApproverIds: string[];
-      if (form.approval_chain && form.approval_chain.length > 0) {
-        const resolution = await resolveApprovalChain(supabase, form.approval_chain, userId);
-        if (!resolution.ok) {
-          toast.error(resolution.message);
-          setSubmitting(false);
-          return;
-        }
-        resolvedApproverIds = resolution.approverIds;
-      } else {
-        resolvedApproverIds = resolveLegacyRequiredApprovers(form.required_approvers ?? []);
-      }
-
-      const approvals = resolvedApproverIds.map((approverId) => ({
-        approver_id: approverId,
-        status: "PENDING" as const,
-        comment: null,
-        decided_at: null,
-      }));
-
-      const { error } = await supabase.from("form_submissions").insert({
-        form_id: form.id,
-        submitted_by: userId,
-        data: values.data,
-        files,
-        status: "PENDING",
-        approvals,
-        draft_id: draftIdRef.current,
+      // Submission creation, form-schema re-validation, and approval-chain
+      // resolution all happen server-side now (src/app/api/submissions/route.ts)
+      // so a direct client insert can no longer forge status/approvals/
+      // approver_id — this call is just the transport.
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          form_id: form.id,
+          data: values.data,
+          files,
+          draft_id: draftIdRef.current,
+        }),
       });
-
-      if (error) throw error;
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? t("fill.submitError"));
 
       localStorage.removeItem(draftKey);
       toast.success(t("fill.submitSuccess"));
@@ -167,7 +144,7 @@ export function DynamicFormRenderer({
       router.refresh();
     } catch (err) {
       console.error(err);
-      toast.error(t("fill.submitError"));
+      toast.error(err instanceof Error ? err.message : t("fill.submitError"));
     } finally {
       setSubmitting(false);
     }

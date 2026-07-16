@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/config";
 import {
   Dialog,
@@ -15,33 +14,24 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { resolveSubmissionFields } from "@/lib/submission-fields";
-import type { ApprovalEntry, FormSubmissionWithRelations, SubmissionStatus } from "@/types";
+import type { FormSubmissionWithRelations } from "@/types";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-function computeOverallStatus(approvals: ApprovalEntry[]): SubmissionStatus {
-  if (approvals.some((a) => a.status === "REJECTED")) return "REJECTED";
-  if (approvals.length > 0 && approvals.every((a) => a.status === "APPROVED")) return "APPROVED";
-  return "PENDING";
-}
 
 export function ApproveRejectDialog({
   submission,
   action,
-  approverId,
   open,
   onOpenChange,
   onComplete,
 }: {
   submission: FormSubmissionWithRelations | null;
   action: "APPROVED" | "REJECTED" | null;
-  approverId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onComplete: () => void;
 }) {
   const { t, locale } = useI18n();
-  const supabase = createClient();
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -61,43 +51,21 @@ export function ApproveRejectDialog({
 
     setSubmitting(true);
 
-    const now = new Date().toISOString();
-
-    // Build the updated approvals array. If this submission has multi-approver
-    // entries in the approvals column, update only this approver's entry.
-    // Fall back to the legacy single-approver path if approvals is empty.
-    let updatedApprovals: ApprovalEntry[];
-    let newStatus: SubmissionStatus;
-
-    if (submission.approvals && submission.approvals.length > 0) {
-      updatedApprovals = submission.approvals.map((entry) =>
-        entry.approver_id === approverId
-          ? { ...entry, status: action, comment: comment.trim() || null, decided_at: now }
-          : entry
-      );
-      newStatus = computeOverallStatus(updatedApprovals);
-    } else {
-      // Legacy single-approver flow: no approvals array — just update top-level status.
-      updatedApprovals = submission.approvals ?? [];
-      newStatus = action;
-    }
-
-    const { error } = await supabase
-      .from("form_submissions")
-      .update({
-        approvals: updatedApprovals,
-        status: newStatus,
-        // Keep the legacy columns in sync for backwards compatibility.
-        approver_id: approverId,
-        approver_comment: comment.trim() || null,
-        approved_at: action === "APPROVED" ? now : null,
-      })
-      .eq("id", submission.id);
+    // S-04 fix: the decision (who the current approver is, and rebuilding the
+    // approvals array/overall status) is now computed server-side
+    // (src/app/api/submissions/[id]/decision/route.ts) from the caller's own
+    // session, instead of trusting a client-built approvals array.
+    const res = await fetch(`/api/submissions/${submission.id}/decision`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, comment: comment.trim() || null }),
+    });
+    const body = await res.json().catch(() => ({}));
 
     setSubmitting(false);
 
-    if (error) {
-      toast.error(t("common.error"));
+    if (!res.ok) {
+      toast.error(body.error ?? t("common.error"));
       return;
     }
 

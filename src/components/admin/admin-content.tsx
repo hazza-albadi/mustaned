@@ -249,7 +249,6 @@ export function AdminContent({
       <ApproveRejectDialog
         submission={actionTarget?.submission ?? null}
         action={actionTarget?.action ?? null}
-        approverId={approverId}
         open={!!actionTarget}
         onOpenChange={(open) => !open && setActionTarget(null)}
         onComplete={() => router.refresh()}
