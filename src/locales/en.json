@@ -237,8 +237,7 @@
     "vacantSuffix": "position(s) are currently vacant",
     "empty": "No positions yet. Click \"Add Position\" to build your org chart.",
     "selectPerson": "Select a person",
-    "person": "Person",
-    "generatedPasswordNotice": "One-time password for the new account:"
+    "person": "Person"
   },
   "profile": {
     "position": "Position",

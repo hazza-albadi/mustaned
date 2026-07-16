@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { data: created, error, generatedPassword } = await createAuthUser({
+  const { data: created, error } = await createAuthUser({
     email,
     password,
     metadata: { name, name_ar, role },
@@ -58,5 +58,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error?.message ?? "Failed to create user" }, { status: 400 });
   }
 
-  return NextResponse.json({ id: created.user.id, generatedPassword }, { status: 201 });
+  return NextResponse.json({ id: created.user.id }, { status: 201 });
 }
