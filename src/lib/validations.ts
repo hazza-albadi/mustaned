@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { FormField } from "@/types";
-import { isDisplayField, MAX_TABLE_ROWS, MAX_TABLE_COLUMNS } from "@/lib/form-fields";
+import { isDisplayField, MAX_TABLE_ROWS, MAX_TABLE_COLUMNS, MAX_TABLE_CELL_LENGTH } from "@/lib/form-fields";
 
 /**
  * Builds a Zod schema at runtime from a form's dynamic JSONB field
@@ -55,7 +55,11 @@ export function buildDynamicSchema(fields: FormField[], locale: "en" | "ar" = "e
         // from the field's current column names — if an admin renames/adds/
         // removes a column after submissions already exist, older rows
         // should still round-trip instead of failing validation retroactively.
-        schema = z.array(z.record(z.string(), z.string())).max(MAX_TABLE_ROWS, "Too many rows");
+        // Per-cell length is capped (see MAX_TABLE_CELL_LENGTH) so a single
+        // cell can never grow taller than a PDF page can hold.
+        schema = z
+          .array(z.record(z.string(), z.string().max(MAX_TABLE_CELL_LENGTH, "Cell value is too long")))
+          .max(MAX_TABLE_ROWS, "Too many rows");
         break;
       case "date":
       case "dropdown":

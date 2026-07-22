@@ -56,6 +56,20 @@ export const MAX_TABLE_ROWS = 50;
 // arbitrary round number.
 export const MAX_TABLE_COLUMNS = 10;
 
+// Character cap per table cell, enforced client-side (Input maxLength) and
+// server-side (Zod, buildDynamicSchema). @react-pdf/renderer's per-row
+// wrap={false} (see submission-pdf.tsx) keeps a row from splitting across a
+// page break — if the row doesn't fit in the space left on the current
+// page it moves to a fresh one, but a row taller than one *entire* page
+// still has nowhere valid to go. Confirmed empirically that a ~975-word
+// cell gets silently clipped (real data loss, not just an overflow) once
+// it exceeds that. 2000 characters (several paragraphs) rendered cleanly
+// on its own page with room to spare, including in the worst realistic
+// position (several rows already ahead of it eating into the page, forcing
+// it onto a fresh page) — comfortably above a normal "long note" and still
+// well below where the page-overflow bug actually triggers.
+export const MAX_TABLE_CELL_LENGTH = 2000;
+
 export function createField(type: FieldType, order: number): FormField {
   const needsOptions = FIELD_TYPES.find((f) => f.type === type)?.hasOptions ?? false;
   const label =

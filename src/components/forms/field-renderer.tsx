@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n/config";
-import { MAX_TABLE_ROWS } from "@/lib/form-fields";
+import { MAX_TABLE_ROWS, MAX_TABLE_CELL_LENGTH } from "@/lib/form-fields";
 import { Plus, Trash2 } from "lucide-react";
 import type { FormField as DynamicField } from "@/types";
 
@@ -230,6 +230,7 @@ export function FieldRenderer({
                                 <Input
                                   value={row[col] ?? ""}
                                   onChange={(e) => updateCell(rowIndex, col, e.target.value)}
+                                  maxLength={MAX_TABLE_CELL_LENGTH}
                                 />
                               </TableCell>
                             ))}
