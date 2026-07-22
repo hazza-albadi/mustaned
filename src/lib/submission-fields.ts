@@ -4,7 +4,8 @@ import type { Locale } from "@/lib/i18n/config";
 export type ResolvedFieldEntry =
   | { id: string; kind: "value"; label: string; value: string }
   | { id: string; kind: "section_heading"; heading: string; description: string | null }
-  | { id: string; kind: "image_block"; imageUrl: string; caption: string | null };
+  | { id: string; kind: "image_block"; imageUrl: string; caption: string | null }
+  | { id: string; kind: "table"; label: string; columns: string[]; rows: Record<string, string>[] };
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "—";
@@ -46,6 +47,16 @@ export function resolveSubmissionFields(
             kind: "image_block",
             imageUrl: typeof field.defaultValue === "string" ? field.defaultValue : "",
             caption: field.description || null,
+          };
+        }
+        if (field.type === "table") {
+          const raw = data[field.id];
+          return {
+            id: field.id,
+            kind: "table",
+            label: localizedLabel(field, locale),
+            columns: field.options,
+            rows: Array.isArray(raw) ? (raw as Record<string, string>[]) : [],
           };
         }
         return {

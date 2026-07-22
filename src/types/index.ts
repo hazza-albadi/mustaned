@@ -40,6 +40,10 @@ export type FieldType =
   | "checkbox"
   | "radio"
   | "file"
+  // Freeform table: admin defines only column headers (stored in `options`,
+  // same slot dropdown/checkbox/radio use for their string lists); the
+  // filler adds as many rows as they want, each cell plain text.
+  | "table"
   // Display-only layout types: render content between questions but collect
   // no user input, are excluded from validation and submission.data.
   | "section_heading"
@@ -61,6 +65,9 @@ export type FormField = {
   required: boolean;
   placeholder: string;
   placeholder_ar: string;
+  // Choice list for dropdown/checkbox/radio. Also doubles as the ordered
+  // column-header list for a table field — same "list of strings" slot,
+  // just a different meaning for that one type.
   options: string[];
   defaultValue: string | number | boolean | null;
   // Section heading subtext, or image_block caption. Unused by input types.

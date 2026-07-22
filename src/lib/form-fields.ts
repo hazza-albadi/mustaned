@@ -17,6 +17,10 @@ export const FIELD_TYPES: FieldTypeMeta[] = [
   { type: "checkbox", icon: "CheckSquare", hasOptions: true },
   { type: "radio", icon: "Circle", hasOptions: true },
   { type: "file", icon: "Paperclip", hasOptions: false },
+  // hasOptions is false here even though a table has a config list too —
+  // the properties panel gives table its own dedicated "Columns" editor
+  // (with reordering) rather than reusing the plain Options editor.
+  { type: "table", icon: "Table", hasOptions: false },
   { type: "section_heading", icon: "Heading", hasOptions: false },
   { type: "image_block", icon: "Image", hasOptions: false },
 ];
@@ -30,6 +34,18 @@ export function isDisplayField(type: FieldType): boolean {
   return NON_INPUT_FIELD_TYPES.includes(type);
 }
 
+// Array-shaped submission values (checkbox multi-select, table rows) — used
+// wherever a default/empty value needs to be seeded before the user's first
+// interaction, since these types can never default to "".
+export function isArrayValueField(type: FieldType): boolean {
+  return type === "checkbox" || type === "table";
+}
+
+// Row cap for a table field, enforced both client-side (disables "Add row")
+// and server-side (Zod, buildDynamicSchema) — keeps the UI and the
+// generated PDF from being handed an unbounded number of rows.
+export const MAX_TABLE_ROWS = 50;
+
 export function createField(type: FieldType, order: number): FormField {
   const needsOptions = FIELD_TYPES.find((f) => f.type === type)?.hasOptions ?? false;
   const label =
@@ -42,7 +58,7 @@ export function createField(type: FieldType, order: number): FormField {
     required: false,
     placeholder: "",
     placeholder_ar: "",
-    options: needsOptions ? ["Option 1", "Option 2"] : [],
+    options: type === "table" ? ["Column 1", "Column 2"] : needsOptions ? ["Option 1", "Option 2"] : [],
     defaultValue: null,
     description: "",
     validation: { min: null, max: null, pattern: null, message: null, message_ar: null },

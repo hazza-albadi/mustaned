@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { resolveSubmissionFields } from "@/lib/submission-fields";
 import type { FormSubmissionWithRelations } from "@/types";
 import { Loader2 } from "lucide-react";
@@ -111,6 +112,41 @@ export function ApproveRejectDialog({
                       />
                     )}
                     {field.caption && <p className="text-xs text-muted-foreground">{field.caption}</p>}
+                  </div>
+                );
+              }
+              if (field.kind === "table") {
+                return (
+                  <div key={field.id} className="space-y-1.5">
+                    <p className="text-muted-foreground">{field.label}</p>
+                    {field.rows.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">{t("fill.tableNoRowsSubmitted")}</p>
+                    ) : (
+                      <div className="overflow-x-auto rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              {field.columns.map((col) => (
+                                <TableHead key={col} className="text-xs">
+                                  {col}
+                                </TableHead>
+                              ))}
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {field.rows.map((row, i) => (
+                              <TableRow key={i}>
+                                {field.columns.map((col) => (
+                                  <TableCell key={col} className="whitespace-normal text-xs">
+                                    {row[col] || "—"}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
                   </div>
                 );
               }

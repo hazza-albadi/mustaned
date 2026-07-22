@@ -72,6 +72,25 @@ const styles = StyleSheet.create({
   imageBlock: { alignItems: "center", marginVertical: 10 },
   blockImage: { maxWidth: 300, maxHeight: 200, objectFit: "contain" },
   imageCaption: { fontSize: 8, color: "#6B7280", marginTop: 4 },
+  tableFieldBlock: { marginBottom: 14 },
+  tableWrap: { borderWidth: 1, borderColor: "#9CA3AF" },
+  tableHeaderRow: { flexDirection: "row", backgroundColor: NAVY },
+  tableHeaderCell: {
+    flex: 1,
+    padding: 4,
+    fontSize: 8,
+    fontWeight: 700,
+    color: "#FFFFFF",
+    textTransform: "uppercase",
+  },
+  tableHeaderCellBorder: { borderRightWidth: 1, borderRightColor: "rgba(255,255,255,0.25)" },
+  // wrap=false keeps a single row's cells from being split across a page
+  // break — the table itself (tableWrap) is left splittable so a long
+  // table still flows onto the next page instead of overflowing.
+  tableRow: { flexDirection: "row", borderTopWidth: 1, borderTopColor: "#E5E7EB" },
+  tableCell: { flex: 1, padding: 4, fontSize: 9, color: "#111827" },
+  tableCellBorder: { borderRightWidth: 1, borderRightColor: "#E5E7EB" },
+  tableEmpty: { padding: 8, fontSize: 9, color: "#6B7280", fontStyle: "italic" },
   filesSection: { marginTop: 8 },
   filesTitle: { fontSize: 9, fontWeight: 700, marginBottom: 4, color: NAVY },
   fileItem: { fontSize: 9, color: "#374151", marginBottom: 2 },
@@ -177,6 +196,46 @@ function SubmissionPdfDocument({ data }: { data: SubmissionPdfData }) {
                 {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer's Image has no alt prop */}
                 {field.imageUrl && <Image src={field.imageUrl} style={styles.blockImage} />}
                 {field.caption && <Text style={styles.imageCaption}>{field.caption}</Text>}
+              </View>
+            );
+          }
+          if (field.kind === "table") {
+            return (
+              <View style={styles.tableFieldBlock} key={field.id}>
+                <Text style={styles.fieldLabel}>{field.label}</Text>
+                {field.rows.length === 0 ? (
+                  <View style={styles.tableWrap}>
+                    <Text style={styles.tableEmpty}>No rows submitted</Text>
+                  </View>
+                ) : (
+                  <View style={styles.tableWrap}>
+                    <View style={styles.tableHeaderRow}>
+                      {field.columns.map((col, i) => (
+                        <Text
+                          key={col}
+                          style={[
+                            styles.tableHeaderCell,
+                            i < field.columns.length - 1 ? styles.tableHeaderCellBorder : {},
+                          ]}
+                        >
+                          {col}
+                        </Text>
+                      ))}
+                    </View>
+                    {field.rows.map((row, rowIndex) => (
+                      <View style={styles.tableRow} key={rowIndex} wrap={false}>
+                        {field.columns.map((col, i) => (
+                          <Text
+                            key={col}
+                            style={[styles.tableCell, i < field.columns.length - 1 ? styles.tableCellBorder : {}]}
+                          >
+                            {row[col] || "—"}
+                          </Text>
+                        ))}
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
             );
           }

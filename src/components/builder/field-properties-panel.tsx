@@ -11,7 +11,7 @@ import { useI18n } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/client";
 import { FIELD_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/form-fields";
 import type { FormField } from "@/types";
-import { Loader2, Plus, Upload, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, Plus, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 // Re-encodes any uploaded image through <canvas> before it's stored, always
@@ -69,6 +69,7 @@ export function FieldPropertiesPanel({
   const hasOptions = FIELD_TYPES.find((f) => f.type === field.type)?.hasOptions ?? false;
   const isSectionHeading = field.type === "section_heading";
   const isImageBlock = field.type === "image_block";
+  const isTable = field.type === "table";
   const isDisplayOnly = isSectionHeading || isImageBlock;
 
   async function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -121,6 +122,19 @@ export function FieldPropertiesPanel({
 
   const removeOption = (index: number) => {
     onChange({ options: field.options.filter((_, i) => i !== index) });
+  };
+
+  const updateColumn = updateOption;
+  const addColumn = () => {
+    onChange({ options: [...field.options, `Column ${field.options.length + 1}`] });
+  };
+  const removeColumn = removeOption;
+  const moveColumn = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= field.options.length) return;
+    const options = [...field.options];
+    [options[index], options[target]] = [options[target], options[index]];
+    onChange({ options });
   };
 
   return (
@@ -262,6 +276,56 @@ export function FieldPropertiesPanel({
             ))}
             <Button type="button" variant="outline" size="sm" className="gap-1" onClick={addOption}>
               <Plus className="h-3 w-3" /> {t("builder.addOption")}
+            </Button>
+          </div>
+        </>
+      )}
+
+      {isTable && (
+        <>
+          <Separator />
+          <div className="space-y-2">
+            <Label>{t("builder.columns", "Columns")}</Label>
+            {field.options.map((col, i) => (
+              <div key={i} className="flex items-center gap-1">
+                <Input value={col} onChange={(e) => updateColumn(i, e.target.value)} />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => moveColumn(i, -1)}
+                  disabled={i === 0}
+                  aria-label="Move column up"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => moveColumn(i, 1)}
+                  disabled={i === field.options.length - 1}
+                  aria-label="Move column down"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => removeColumn(i)}
+                  disabled={field.options.length <= 1}
+                  aria-label="Remove column"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" className="gap-1" onClick={addColumn}>
+              <Plus className="h-3 w-3" /> {t("builder.addColumn", "Add column")}
             </Button>
           </div>
         </>

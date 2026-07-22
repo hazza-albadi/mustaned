@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { FormField } from "@/types";
-import { isDisplayField } from "@/lib/form-fields";
+import { isDisplayField, MAX_TABLE_ROWS } from "@/lib/form-fields";
 
 /**
  * Builds a Zod schema at runtime from a form's dynamic JSONB field
@@ -50,6 +50,13 @@ export function buildDynamicSchema(fields: FormField[], locale: "en" | "ar" = "e
         // instead of silently no-op'ing on z.any().
         schema = z.string();
         break;
+      case "table":
+        // Each row is a plain string-keyed record rather than a schema built
+        // from the field's current column names — if an admin renames/adds/
+        // removes a column after submissions already exist, older rows
+        // should still round-trip instead of failing validation retroactively.
+        schema = z.array(z.record(z.string(), z.string())).max(MAX_TABLE_ROWS, "Too many rows");
+        break;
       case "date":
       case "dropdown":
       case "radio":
@@ -67,18 +74,17 @@ export function buildDynamicSchema(fields: FormField[], locale: "en" | "ar" = "e
       }
     }
 
-    if (field.type !== "checkbox") {
-      if (field.required) {
-        if (schema instanceof z.ZodString) {
-          schema = schema.min(1, msg ?? "This field is required");
-        }
-      } else {
-        schema = schema.optional().or(z.literal(""));
-      }
-    } else if (schema instanceof z.ZodArray) {
-      // .min() must run on the raw ZodArray before .default() wraps it —
+    if (schema instanceof z.ZodArray) {
+      // Array-shaped fields (checkbox multi-select, table rows) — .min()
+      // must run on the raw ZodArray before .default() wraps it, since
       // ZodDefault doesn't expose .min()/.max().
       schema = field.required ? schema.min(1, msg ?? "This field is required") : schema.default([]);
+    } else if (field.required) {
+      if (schema instanceof z.ZodString) {
+        schema = schema.min(1, msg ?? "This field is required");
+      }
+    } else {
+      schema = schema.optional().or(z.literal(""));
     }
 
     shape[field.id] = schema;
@@ -151,33 +157,52 @@ export const fieldValidationSchema = z.object({
   message_ar: z.string().nullable(),
 });
 
-export const formFieldSchema = z.object({
-  id: z.string(),
-  type: z.enum([
-    "text",
-    "textarea",
-    "number",
-    "email",
-    "date",
-    "dropdown",
-    "checkbox",
-    "radio",
-    "file",
-    "section_heading",
-    "image_block",
-  ]),
-  label: z.string().min(1, "Label is required"),
-  label_ar: z.string(),
-  required: z.boolean(),
-  placeholder: z.string(),
-  placeholder_ar: z.string(),
-  options: z.array(z.string()),
-  defaultValue: z.union([z.string(), z.number(), z.boolean(), z.null()]),
-  // Optional/defaulted so forms saved before this field existed still parse.
-  description: z.string().default(""),
-  validation: fieldValidationSchema,
-  order: z.number(),
-});
+export const formFieldSchema = z
+  .object({
+    id: z.string(),
+    type: z.enum([
+      "text",
+      "textarea",
+      "number",
+      "email",
+      "date",
+      "dropdown",
+      "checkbox",
+      "radio",
+      "file",
+      "table",
+      "section_heading",
+      "image_block",
+    ]),
+    label: z.string().min(1, "Label is required"),
+    label_ar: z.string(),
+    required: z.boolean(),
+    placeholder: z.string(),
+    placeholder_ar: z.string(),
+    options: z.array(z.string()),
+    defaultValue: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    // Optional/defaulted so forms saved before this field existed still parse.
+    description: z.string().default(""),
+    validation: fieldValidationSchema,
+    order: z.number(),
+  })
+  // Table's `options` holds column headers, not free-form choices — needs
+  // its own shape rules (at least one, none blank, none duplicated) on top
+  // of the plain array(string) check above.
+  .superRefine((field, ctx) => {
+    if (field.type !== "table") return;
+    if (field.options.length < 1) {
+      ctx.addIssue({ code: "custom", message: "Add at least one column", path: ["options"] });
+      return;
+    }
+    const trimmed = field.options.map((c) => c.trim());
+    if (trimmed.some((c) => c.length === 0)) {
+      ctx.addIssue({ code: "custom", message: "Column names cannot be empty", path: ["options"] });
+    }
+    if (new Set(trimmed).size !== trimmed.length) {
+      ctx.addIssue({ code: "custom", message: "Column names must be unique", path: ["options"] });
+    }
+  });
 
 export const approvalEntrySchema = z.object({
   approver_id: z.string().uuid(),

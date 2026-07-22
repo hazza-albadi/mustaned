@@ -113,7 +113,10 @@
     "draftSaved": "تم حفظ المسودة",
     "continueDraft": "لديك مسودة محفوظة لهذا النموذج. هل تريد المتابعة من حيث توقفت؟",
     "discardDraft": "تجاهل",
-    "loadDraft": "متابعة المسودة"
+    "loadDraft": "متابعة المسودة",
+    "addRow": "إضافة صف",
+    "tableEmptyHint": "لم تُضف أي صفوف بعد",
+    "tableNoRowsSubmitted": "لم يتم إرسال أي صفوف"
   },
   "admin": {
     "panelTitle": "لوحة إدارة القسم",
@@ -170,6 +173,8 @@
     "placeholderAr": "النص التوضيحي (عربي)",
     "options": "الخيارات",
     "addOption": "إضافة خيار",
+    "columns": "الأعمدة",
+    "addColumn": "إضافة عمود",
     "requiredField": "حقل مطلوب",
     "filters": "التصنيفات",
     "noFiltersAvailable": "لا توجد تصنيفات متاحة",
@@ -197,6 +202,7 @@
       "checkbox": "مربعات اختيار",
       "radio": "اختيار من متعدد",
       "file": "رفع ملف",
+      "table": "جدول",
       "section_heading": "عنوان قسم",
       "image_block": "كتلة صورة"
     }

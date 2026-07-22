@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -14,7 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n/config";
+import { MAX_TABLE_ROWS } from "@/lib/form-fields";
+import { Plus, Trash2 } from "lucide-react";
 import type { FormField as DynamicField } from "@/types";
 
 export function FieldRenderer({
@@ -181,6 +185,84 @@ export function FieldRenderer({
                   onChange={(e) => rhf.onChange(e.target.files?.[0]?.name ?? "")}
                 />
               );
+            case "table": {
+              const columns = field.options;
+              const rows: Record<string, string>[] = Array.isArray(rhf.value) ? rhf.value : [];
+
+              const addRow = () => {
+                if (rows.length >= MAX_TABLE_ROWS) return;
+                rhf.onChange([...rows, Object.fromEntries(columns.map((c) => [c, ""]))]);
+              };
+              const removeRow = (rowIndex: number) => {
+                rhf.onChange(rows.filter((_, i) => i !== rowIndex));
+              };
+              const updateCell = (rowIndex: number, column: string, value: string) => {
+                rhf.onChange(rows.map((r, i) => (i === rowIndex ? { ...r, [column]: value } : r)));
+              };
+
+              return (
+                <div className="space-y-2">
+                  <div className="overflow-x-auto rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          {columns.map((col) => (
+                            <TableHead key={col}>{col}</TableHead>
+                          ))}
+                          <TableHead className="w-10" />
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {rows.length === 0 && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columns.length + 1}
+                              className="h-16 whitespace-normal text-center text-muted-foreground"
+                            >
+                              {t("fill.tableEmptyHint")}
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {rows.map((row, rowIndex) => (
+                          <TableRow key={rowIndex}>
+                            {columns.map((col) => (
+                              <TableCell key={col} className="p-1">
+                                <Input
+                                  value={row[col] ?? ""}
+                                  onChange={(e) => updateCell(rowIndex, col, e.target.value)}
+                                />
+                              </TableCell>
+                            ))}
+                            <TableCell className="p-1">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                                onClick={() => removeRow(rowIndex)}
+                                aria-label="Remove row"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    onClick={addRow}
+                    disabled={rows.length >= MAX_TABLE_ROWS}
+                  >
+                    <Plus className="h-3.5 w-3.5" /> {t("fill.addRow")}
+                  </Button>
+                </div>
+              );
+            }
             case "text":
             default:
               return (

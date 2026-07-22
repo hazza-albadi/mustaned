@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { useI18n } from "@/lib/i18n/config";
 import { submissionFormSchema } from "@/lib/validations";
-import { isDisplayField } from "@/lib/form-fields";
+import { isDisplayField, isArrayValueField } from "@/lib/form-fields";
 import { FieldRenderer } from "@/components/forms/field-renderer";
 import { FileUpload } from "@/components/forms/file-upload";
 import { Button } from "@/components/ui/button";
@@ -70,7 +70,7 @@ export function DynamicFormRenderer({
       data: Object.fromEntries(
         sortedFields
           .filter((f) => !isDisplayField(f.type))
-          .map((f) => [f.id, f.type === "checkbox" ? [] : f.defaultValue ?? ""])
+          .map((f) => [f.id, isArrayValueField(f.type) ? [] : f.defaultValue ?? ""])
       ),
     },
   });

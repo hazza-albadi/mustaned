@@ -17,6 +17,7 @@ import {
   Paperclip,
   Heading,
   Image as ImageIcon,
+  Table as TableIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ const ICONS: Record<string, LucideIcon> = {
   Paperclip,
   Heading,
   Image: ImageIcon,
+  Table: TableIcon,
 };
 
 function PaletteItem({ type, icon }: { type: FieldType; icon: string }) {

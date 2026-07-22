@@ -113,7 +113,10 @@
     "draftSaved": "Draft saved",
     "continueDraft": "You have a saved draft for this form. Continue where you left off?",
     "discardDraft": "Discard",
-    "loadDraft": "Continue draft"
+    "loadDraft": "Continue draft",
+    "addRow": "Add row",
+    "tableEmptyHint": "No rows added yet",
+    "tableNoRowsSubmitted": "No rows submitted"
   },
   "admin": {
     "panelTitle": "Department Admin Panel",
@@ -170,6 +173,8 @@
     "placeholderAr": "Placeholder (Arabic)",
     "options": "Options",
     "addOption": "Add option",
+    "columns": "Columns",
+    "addColumn": "Add column",
     "requiredField": "Required field",
     "filters": "Filters",
     "noFiltersAvailable": "No filters available",
@@ -206,6 +211,7 @@
       "checkbox": "Checkboxes",
       "radio": "Multiple Choice",
       "file": "File Upload",
+      "table": "Table",
       "section_heading": "Section Heading",
       "image_block": "Image Block"
     }
