@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { Document, Page, Text, View, Image, StyleSheet, pdf } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet, Font, pdf } from "@react-pdf/renderer";
 import type { ResolvedFieldEntry } from "@/lib/submission-fields";
 
 // Server-only module (rendered inside /api/generate-pdf) — safe to read the
@@ -8,6 +8,19 @@ import type { ResolvedFieldEntry } from "@/lib/submission-fields";
 // ambiguity between a relative browser path and a server-side file path.
 const LOGO_PATH = path.join(process.cwd(), "public", "logo.png");
 const logoBuffer = fs.readFileSync(LOGO_PATH);
+
+// @react-pdf/renderer's default text layout only wraps at whitespace — a
+// single long hyphen-joined token (a date like "22-07-2026", an item code,
+// a SKU) has none, so it's treated as one unbreakable word. In a normal
+// paragraph that's rarely visible, but inside a narrow table cell (many
+// columns) it overflows the cell and visibly overlaps the next one instead
+// of wrapping. Registering hyphens as valid break points fixes this at the
+// source rather than just hoping cells stay wide enough.
+Font.registerHyphenationCallback((word) => {
+  if (!word.includes("-")) return [word];
+  const parts = word.split("-");
+  return parts.map((part, i) => (i < parts.length - 1 ? `${part}-` : part));
+});
 
 // UTAS brand palette — kept as literal hex since @react-pdf/renderer renders
 // to a PDF canvas, not the DOM, so CSS custom properties aren't available.

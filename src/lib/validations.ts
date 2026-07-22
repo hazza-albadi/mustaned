@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { FormField } from "@/types";
-import { isDisplayField, MAX_TABLE_ROWS } from "@/lib/form-fields";
+import { isDisplayField, MAX_TABLE_ROWS, MAX_TABLE_COLUMNS } from "@/lib/form-fields";
 
 /**
  * Builds a Zod schema at runtime from a form's dynamic JSONB field
@@ -187,12 +187,16 @@ export const formFieldSchema = z
     order: z.number(),
   })
   // Table's `options` holds column headers, not free-form choices — needs
-  // its own shape rules (at least one, none blank, none duplicated) on top
-  // of the plain array(string) check above.
+  // its own shape rules (at least one, none blank, none duplicated, capped)
+  // on top of the plain array(string) check above.
   .superRefine((field, ctx) => {
     if (field.type !== "table") return;
     if (field.options.length < 1) {
       ctx.addIssue({ code: "custom", message: "Add at least one column", path: ["options"] });
+      return;
+    }
+    if (field.options.length > MAX_TABLE_COLUMNS) {
+      ctx.addIssue({ code: "custom", message: "Too many columns", path: ["options"] });
       return;
     }
     const trimmed = field.options.map((c) => c.trim());

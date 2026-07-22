@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { useI18n } from "@/lib/i18n/config";
 import { createClient } from "@/lib/supabase/client";
-import { FIELD_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/form-fields";
+import { FIELD_TYPES, MAX_FILE_SIZE_BYTES, MAX_TABLE_COLUMNS } from "@/lib/form-fields";
 import type { FormField } from "@/types";
 import { ChevronDown, ChevronUp, Loader2, Plus, Upload, X } from "lucide-react";
 import { toast } from "sonner";
@@ -126,6 +126,7 @@ export function FieldPropertiesPanel({
 
   const updateColumn = updateOption;
   const addColumn = () => {
+    if (field.options.length >= MAX_TABLE_COLUMNS) return;
     onChange({ options: [...field.options, `Column ${field.options.length + 1}`] });
   };
   const removeColumn = removeOption;
@@ -286,45 +287,54 @@ export function FieldPropertiesPanel({
           <Separator />
           <div className="space-y-2">
             <Label>{t("builder.columns", "Columns")}</Label>
-            {field.options.map((col, i) => (
-              <div key={i} className="flex items-center gap-1">
-                <Input value={col} onChange={(e) => updateColumn(i, e.target.value)} />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0"
-                  onClick={() => moveColumn(i, -1)}
-                  disabled={i === 0}
-                  aria-label="Move column up"
-                >
-                  <ChevronUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0"
-                  onClick={() => moveColumn(i, 1)}
-                  disabled={i === field.options.length - 1}
-                  aria-label="Move column down"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0"
-                  onClick={() => removeColumn(i)}
-                  disabled={field.options.length <= 1}
-                  aria-label="Remove column"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button type="button" variant="outline" size="sm" className="gap-1" onClick={addColumn}>
+            <div className="max-h-64 space-y-1.5 overflow-y-auto pe-1">
+              {field.options.map((col, i) => (
+                <div key={i} className="flex items-center gap-1">
+                  <Input value={col} onChange={(e) => updateColumn(i, e.target.value)} />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => moveColumn(i, -1)}
+                    disabled={i === 0}
+                    aria-label="Move column up"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => moveColumn(i, 1)}
+                    disabled={i === field.options.length - 1}
+                    aria-label="Move column down"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => removeColumn(i)}
+                    disabled={field.options.length <= 1}
+                    aria-label="Remove column"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={addColumn}
+              disabled={field.options.length >= MAX_TABLE_COLUMNS}
+            >
               <Plus className="h-3 w-3" /> {t("builder.addColumn", "Add column")}
             </Button>
           </div>

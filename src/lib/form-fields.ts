@@ -46,6 +46,16 @@ export function isArrayValueField(type: FieldType): boolean {
 // generated PDF from being handed an unbounded number of rows.
 export const MAX_TABLE_ROWS = 50;
 
+// Column cap for a table field, enforced both client-side (disables "Add
+// column") and server-side (formFieldSchema). Determined empirically against
+// the PDF's actual page width: at 10 columns (with realistic headers and
+// hyphenated cell content, the worst case for @react-pdf/renderer's text
+// wrapping) every header and cell stays legible with no overlap; by 12 the
+// header row is already visibly crowded, and by 15 header text overlaps
+// outright — so 10 is the largest count confirmed to render cleanly, not an
+// arbitrary round number.
+export const MAX_TABLE_COLUMNS = 10;
+
 export function createField(type: FieldType, order: number): FormField {
   const needsOptions = FIELD_TYPES.find((f) => f.type === type)?.hasOptions ?? false;
   const label =
