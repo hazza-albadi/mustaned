@@ -14,6 +14,14 @@ import { LanguageSwitcher } from "@/components/common/language-switcher";
 import { UtasLogo } from "@/components/common/utas-logo";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
+// Temporary rollout toggle — flip to true to bring the Sign Up tab back.
+// Everything behind it (this form's signup state/handlers, /api/signups and
+// its approve/reject routes, 0013/0014 migrations, /admin/signups) is fully
+// intact and untouched; this is the only gate. No other feature-flag
+// convention exists yet in this codebase to match, so this is a plain
+// module-level constant rather than an env var.
+const SIGNUP_ENABLED = false;
+
 export function LoginForm() {
   const { t } = useI18n();
   const router = useRouter();
@@ -193,6 +201,40 @@ export function LoginForm() {
               <Button type="submit" className="w-full" disabled={loading || mfaCode.trim().length < 6}>
                 {loading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                 {t("common.confirm", "Confirm")}
+              </Button>
+            </form>
+          ) : !SIGNUP_ENABLED ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="email">{t("auth.email")}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">{t("auth.password")}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+                {loading ? t("auth.loggingIn") : t("auth.login")}
               </Button>
             </form>
           ) : (
