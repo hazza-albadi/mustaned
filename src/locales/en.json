@@ -66,7 +66,13 @@
     "mfaDisable": "Disable",
     "mfaEnabled": "Two-factor authentication enabled",
     "mfaDisabled": "Two-factor authentication disabled",
-    "mfaManualEntry": "Or enter manually"
+    "mfaManualEntry": "Or enter manually",
+    "signUp": "Sign Up",
+    "civilId": "Civil ID",
+    "passwordHint": "At least 10 characters, with uppercase, lowercase, a number, and a symbol",
+    "pendingApproval": "Your account is pending admin approval",
+    "signupRejected": "Your sign-up request was not approved",
+    "signupSuccessDesc": "Your sign-up request has been submitted and is pending admin approval."
   },
   "roles": {
     "SUPER_ADMIN": "Super Admin",
@@ -83,7 +89,8 @@
     "orgChart": "Org Chart",
     "filters": "Filters",
     "analytics": "Analytics",
-    "admins": "Admins"
+    "admins": "Admins",
+    "signupRequests": "Sign-Up Requests"
   },
   "status": {
     "PENDING": "Pending",
@@ -152,7 +159,8 @@
       "manage_forms": "Manage Forms",
       "manage_org_chart": "Manage Org Chart",
       "manage_filters": "Manage Filters",
-      "view_analytics": "View Analytics"
+      "view_analytics": "View Analytics",
+      "approve_signups": "Approve Sign-Ups"
     }
   },
   "builder": {
@@ -256,6 +264,19 @@
     "editFilter": "Edit Filter",
     "nameEn": "Name (English)",
     "nameAr": "Name (Arabic)"
+  },
+  "signups": {
+    "title": "Sign-Up Requests",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "rejectedNote": "No further action",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveTitle": "Approve sign-up request",
+    "confirmRejectTitle": "Reject this sign-up request?",
+    "assignPosition": "Assign position (optional)",
+    "assignLater": "Assign later",
+    "noPositionsAvailable": "No vacant positions available"
   },
   "errors": {
     "notFound": "Page not found",

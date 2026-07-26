@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { ROLE_HOME } from "@/lib/roles";
 import type { Role } from "@/types";
 
-const PUBLIC_PATHS = ["/login", "/auth", "/_next", "/favicon.ico"];
+const PUBLIC_PATHS = ["/login", "/auth", "/_next", "/favicon.ico", "/api/signups"];
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 // S-12: CSRF defense-in-depth for mutating API routes. The app doesn't set
@@ -96,9 +96,17 @@ export async function updateSession(request: NextRequest) {
   if (user && path === "/login") {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, account_status")
       .eq("id", user.id)
       .single();
+
+    // A PENDING/REJECTED account (self-service sign-up awaiting/denied admin
+    // approval) still has a valid session — but must stay on /login rather
+    // than being bounced into the app, or it would ping-pong once the
+    // account_status gate below sends it right back here.
+    if (profile && profile.account_status !== "ACTIVE") {
+      return supabaseResponse;
+    }
 
     return redirectTo(profile ? ROLE_HOME[profile.role as Role] ?? "/forms" : "/forms");
   }
@@ -132,6 +140,17 @@ export async function updateSession(request: NextRequest) {
     }
 
     const role = profile?.role as Role | undefined;
+
+    // PENDING/REJECTED accounts (self-service sign-up awaiting/denied admin
+    // approval) must not reach any gated app route or the fill flow — bounce
+    // to /login, where the login form's post-sign-in check shows the
+    // specific status message. This is page-level UX only; the RLS changes
+    // in 0013_signup_requests.sql (auth_is_approved()) are the real backstop
+    // against a direct API/SDK call, since /api/* isn't covered by
+    // isGatedPath.
+    if (profile && profile.account_status !== "ACTIVE" && (isGatedPath || path.startsWith("/fill/"))) {
+      return redirectTo("/login");
+    }
 
     if (isGatedPath && !role) {
       return redirectTo("/forms");
@@ -178,7 +197,8 @@ export async function updateSession(request: NextRequest) {
           path.startsWith("/admin/builder") ||
           path.startsWith("/admin/org") ||
           path.startsWith("/admin/filters") ||
-          path.startsWith("/admin/analytics");
+          path.startsWith("/admin/analytics") ||
+          path.startsWith("/admin/signups");
 
         // Coarse gate only — Super Admin and Admin both pass here. Each page's
         // own requirePermission() call does the real per-permission check

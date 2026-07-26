@@ -8,4 +8,5 @@ export const ADMIN_PERMISSION_OPTIONS: { value: AdminPermission; labelKey: strin
   { value: "manage_org_chart", labelKey: "admin.permission.manage_org_chart" },
   { value: "manage_filters", labelKey: "admin.permission.manage_filters" },
   { value: "view_analytics", labelKey: "admin.permission.view_analytics" },
+  { value: "approve_signups", labelKey: "admin.permission.approve_signups" },
 ];

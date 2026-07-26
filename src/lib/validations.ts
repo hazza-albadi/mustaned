@@ -131,7 +131,30 @@ export const adminPermissionEnum = z.enum([
   "view_analytics",
   "view_submissions",
   "manage_filters",
+  "approve_signups",
 ]);
+
+// Oman Civil ID: 8-digit numeric identifier. ASSUMPTION — no authoritative
+// spec was available in this repo to confirm the exact format; adjust this
+// regex if it turns out to differ.
+const civilIdSchema = z.string().regex(/^[0-9]{8}$/, "Civil ID must be 8 digits");
+
+export const signupRequestSchema = z.object({
+  civil_id: civilIdSchema,
+  email: z.string().email("Invalid email address"),
+  // Chosen directly by the person signing up — same S-09 policy as every
+  // other password this app issues.
+  password: passwordComplexity,
+});
+
+export const signupApprovalSchema = z.object({
+  // Optional org-chart position to place them into as part of approval —
+  // reuses the same assigned_profile_id mechanism as the org chart's
+  // existing "assign person" flow. Left unassigned (null), the person still
+  // becomes a normal ACTIVE, unassigned profile that an admin can place
+  // later via the Org Chart page like any other unassigned employee.
+  node_id: z.string().uuid().nullable(),
+});
 
 export const filterSchema = z.object({
   name: z.string().min(2, "Name is required"),

@@ -20,6 +20,7 @@ export const ADMIN_PERMISSION_PRIORITY: AdminPermission[] = [
   "manage_org_chart",
   "manage_filters",
   "view_analytics",
+  "approve_signups",
 ];
 
 export const ADMIN_PERMISSION_HOME: Record<AdminPermission, string> = {
@@ -28,6 +29,7 @@ export const ADMIN_PERMISSION_HOME: Record<AdminPermission, string> = {
   manage_org_chart: "/admin/org",
   manage_filters: "/admin/filters",
   view_analytics: "/admin/analytics",
+  approve_signups: "/admin/signups",
 };
 
 // The first page an ADMIN can actually use, in priority order — or the

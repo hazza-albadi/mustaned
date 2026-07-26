@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { LanguageSwitcher } from "@/components/common/language-switcher";
 import { UtasLogo } from "@/components/common/utas-logo";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2 } from "lucide-react";
 
 export function LoginForm() {
   const { t } = useI18n();
@@ -30,6 +31,13 @@ export function LoginForm() {
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
 
+  const [civilId, setCivilId] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupError, setSignupError] = useState<string | null>(null);
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
+
   function completeLogin() {
     // S-05: only ever follow a relative, same-origin path. A bare "/" prefix
     // check alone isn't enough — "//evil.com" and "/\evil.com" both parse as
@@ -47,11 +55,36 @@ export function LoginForm() {
     setError(null);
     setLoading(true);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (signInError) {
+    if (signInError || !signInData.user) {
       setError(t("auth.invalidCredentials"));
       setLoading(false);
+      return;
+    }
+
+    // Sign-up (self-service, gated by admin approval) creates the auth user
+    // immediately with real credentials but the profile starts out
+    // PENDING/REJECTED — signInWithPassword succeeds either way, so this
+    // status check has to happen before anything else (including MFA), and
+    // must sign the session back out rather than leaving it dangling in the
+    // browser once denied. RLS (auth_is_approved(), 0013_signup_requests.sql)
+    // blocks any real data access regardless, but the UI shouldn't imply
+    // they're signed in.
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("account_status")
+      .eq("id", signInData.user.id)
+      .single();
+
+    if (profile && profile.account_status !== "ACTIVE") {
+      await supabase.auth.signOut();
+      setLoading(false);
+      setError(
+        profile.account_status === "PENDING"
+          ? t("auth.pendingApproval", "Your account is pending admin approval")
+          : t("auth.signupRejected", "Your sign-up request was not approved")
+      );
       return;
     }
 
@@ -103,6 +136,27 @@ export function LoginForm() {
     completeLogin();
   }
 
+  async function handleSignupSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSignupError(null);
+    setSignupLoading(true);
+
+    const res = await fetch("/api/signups", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ civil_id: civilId, email: signupEmail, password: signupPassword }),
+    });
+    const body = await res.json().catch(() => ({}));
+    setSignupLoading(false);
+
+    if (!res.ok) {
+      setSignupError(body.error ?? t("common.error"));
+      return;
+    }
+
+    setSignupSuccess(true);
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
       <div className="absolute top-4 end-4">
@@ -142,39 +196,110 @@ export function LoginForm() {
               </Button>
             </form>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="email">{t("auth.email")}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">{t("auth.password")}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-                {loading ? t("auth.loggingIn") : t("auth.login")}
-              </Button>
-            </form>
+            <Tabs defaultValue="login">
+              <TabsList className="mb-4 grid w-full grid-cols-2">
+                <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
+                <TabsTrigger value="signup">{t("auth.signUp", "Sign Up")}</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="login">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="email">{t("auth.email")}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">{t("auth.password")}</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+                    {loading ? t("auth.loggingIn") : t("auth.login")}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="signup">
+                {signupSuccess ? (
+                  <Alert>
+                    <CheckCircle2 className="h-4 w-4" />
+                    <AlertDescription>
+                      {t("auth.signupSuccessDesc", "Your sign-up request has been submitted and is pending admin approval.")}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <form onSubmit={handleSignupSubmit} className="space-y-4">
+                    {signupError && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{signupError}</AlertDescription>
+                      </Alert>
+                    )}
+                    <div className="space-y-2">
+                      <Label htmlFor="civilId">{t("auth.civilId", "Civil ID")}</Label>
+                      <Input
+                        id="civilId"
+                        inputMode="numeric"
+                        maxLength={8}
+                        required
+                        value={civilId}
+                        onChange={(e) => setCivilId(e.target.value.replace(/\D/g, ""))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signupEmail">{t("auth.email")}</Label>
+                      <Input
+                        id="signupEmail"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        value={signupEmail}
+                        onChange={(e) => setSignupEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signupPassword">{t("auth.password")}</Label>
+                      <Input
+                        id="signupPassword"
+                        type="password"
+                        required
+                        autoComplete="new-password"
+                        value={signupPassword}
+                        onChange={(e) => setSignupPassword(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "auth.passwordHint",
+                          "At least 10 characters, with uppercase, lowercase, a number, and a symbol"
+                        )}
+                      </p>
+                    </div>
+                    <Button type="submit" className="w-full" disabled={signupLoading}>
+                      {signupLoading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+                      {t("auth.signUp", "Sign Up")}
+                    </Button>
+                  </form>
+                )}
+              </TabsContent>
+            </Tabs>
           )}
         </CardContent>
       </Card>

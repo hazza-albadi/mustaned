@@ -18,7 +18,8 @@ export type AdminPermission =
   | "manage_org_chart"
   | "view_analytics"
   | "view_submissions"
-  | "manage_filters";
+  | "manage_filters"
+  | "approve_signups";
 
 export type AdminPermissionRow = {
   id: string;
@@ -89,6 +90,8 @@ export type Filter = {
   updated_at: string;
 };
 
+export type AccountStatus = "PENDING" | "ACTIVE" | "REJECTED";
+
 export type Profile = {
   id: string;
   name: string;
@@ -97,6 +100,13 @@ export type Profile = {
   role: Role;
   is_active: boolean;
   avatar_url: string | null;
+  // Future Kawader matching key. Null for every account provisioned by an
+  // admin (only self-service sign-up collects it).
+  civil_id: string | null;
+  // ACTIVE for every account provisioned by an admin. Self-service sign-up
+  // is the only path that creates a PENDING profile, resolved to ACTIVE or
+  // REJECTED by an admin with approve_signups.
+  account_status: AccountStatus;
   created_at: string;
   updated_at: string;
 };

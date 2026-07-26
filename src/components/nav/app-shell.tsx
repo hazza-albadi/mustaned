@@ -23,6 +23,7 @@ import {
   LogOut,
   Menu,
   FileText,
+  UserCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,7 @@ const NAV_ITEMS_BY_ROLE: Record<Exclude<Profile["role"], "ADMIN">, NavItem[]> = 
     { href: "/admin/org", icon: Network, labelKey: "nav.orgChart" },
     { href: "/admin/filters", icon: Tag, labelKey: "nav.filters" },
     { href: "/admin/analytics", icon: BarChart3, labelKey: "nav.analytics" },
+    { href: "/admin/signups", icon: UserCheck, labelKey: "nav.signupRequests" },
     { href: "/admin/admins", icon: ShieldCheck, labelKey: "nav.admins" },
   ],
 };
@@ -62,6 +64,7 @@ const ADMIN_PERMISSION_NAV: Record<AdminPermission, NavItem> = {
   manage_org_chart: { href: "/admin/org", icon: Network, labelKey: "nav.orgChart" },
   manage_filters: { href: "/admin/filters", icon: Tag, labelKey: "nav.filters" },
   view_analytics: { href: "/admin/analytics", icon: BarChart3, labelKey: "nav.analytics" },
+  approve_signups: { href: "/admin/signups", icon: UserCheck, labelKey: "nav.signupRequests" },
 };
 
 function NavLinks({

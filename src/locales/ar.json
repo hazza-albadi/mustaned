@@ -66,7 +66,13 @@
     "mfaDisable": "تعطيل",
     "mfaEnabled": "تم تفعيل المصادقة الثنائية",
     "mfaDisabled": "تم تعطيل المصادقة الثنائية",
-    "mfaManualEntry": "أو أدخل يدوياً"
+    "mfaManualEntry": "أو أدخل يدوياً",
+    "signUp": "إنشاء حساب",
+    "civilId": "الرقم المدني",
+    "passwordHint": "10 أحرف على الأقل، تحتوي على حرف كبير وحرف صغير ورقم ورمز",
+    "pendingApproval": "حسابك قيد انتظار موافقة المسؤول",
+    "signupRejected": "لم تتم الموافقة على طلب إنشاء الحساب",
+    "signupSuccessDesc": "تم إرسال طلب إنشاء الحساب وهو الآن قيد انتظار موافقة المسؤول."
   },
   "roles": {
     "SUPER_ADMIN": "مدير عام",
@@ -83,7 +89,8 @@
     "orgChart": "الهيكل التنظيمي",
     "filters": "التصنيفات",
     "analytics": "التحليلات",
-    "admins": "المسؤولون"
+    "admins": "المسؤولون",
+    "signupRequests": "طلبات إنشاء الحسابات"
   },
   "status": {
     "PENDING": "قيد الانتظار",
@@ -152,7 +159,8 @@
       "manage_forms": "إدارة النماذج",
       "manage_org_chart": "إدارة الهيكل التنظيمي",
       "manage_filters": "إدارة التصنيفات",
-      "view_analytics": "عرض التحليلات"
+      "view_analytics": "عرض التحليلات",
+      "approve_signups": "الموافقة على طلبات إنشاء الحسابات"
     }
   },
   "builder": {
@@ -218,6 +226,19 @@
     "editFilter": "تعديل التصنيف",
     "nameEn": "الاسم (إنجليزي)",
     "nameAr": "الاسم (عربي)"
+  },
+  "signups": {
+    "title": "طلبات إنشاء الحسابات",
+    "pending": "قيد الانتظار",
+    "rejected": "مرفوض",
+    "rejectedNote": "لا يوجد إجراء آخر",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "approveTitle": "الموافقة على طلب إنشاء الحساب",
+    "confirmRejectTitle": "هل تريد رفض طلب إنشاء الحساب هذا؟",
+    "assignPosition": "تعيين منصب (اختياري)",
+    "assignLater": "التعيين لاحقاً",
+    "noPositionsAvailable": "لا توجد مناصب شاغرة متاحة"
   },
   "errors": {
     "notFound": "الصفحة غير موجودة",
