@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/config";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +30,6 @@ import { toast } from "sonner";
 export function FiltersTable({ filters }: { filters: Filter[] }) {
   const { t, locale } = useI18n();
   const router = useRouter();
-  const supabase = createClient();
 
   const [editTarget, setEditTarget] = useState<Filter | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -41,10 +39,15 @@ export function FiltersTable({ filters }: { filters: Filter[] }) {
   async function confirmDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    const { error } = await supabase.from("filters").update({ is_active: false }).eq("id", deleteTarget.id);
+    const res = await fetch(`/api/filters/${deleteTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: false }),
+    });
+    const body = await res.json().catch(() => ({}));
     setDeleting(false);
-    if (error) {
-      toast.error(error.message);
+    if (!res.ok) {
+      toast.error(body.error ?? t("common.error"));
       return;
     }
     toast.success(t("common.success"));

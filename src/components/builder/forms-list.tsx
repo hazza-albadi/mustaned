@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/config";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Button } from "@/components/ui/button";
@@ -34,7 +33,6 @@ import { toast } from "sonner";
 export function FormsList({ forms }: { forms: FormDefinition[] }) {
   const { t, locale } = useI18n();
   const router = useRouter();
-  const supabase = createClient();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 250);
   const [deleteTarget, setDeleteTarget] = useState<FormDefinition | null>(null);
@@ -48,9 +46,9 @@ export function FormsList({ forms }: { forms: FormDefinition[] }) {
   async function confirmDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    const { error } = await supabase.from("forms").delete().eq("id", deleteTarget.id);
+    const res = await fetch(`/api/forms/${deleteTarget.id}`, { method: "DELETE" });
     setDeleting(false);
-    if (error) {
+    if (!res.ok) {
       toast.error(t("common.error"));
       return;
     }

@@ -17,7 +17,6 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/config";
 import { createField } from "@/lib/form-fields";
 import { formBuilderSchema } from "@/lib/validations";
@@ -80,7 +79,6 @@ export function FormBuilder({
 }) {
   const { t, locale } = useI18n();
   const router = useRouter();
-  const supabase = createClient();
 
   const [title, setTitle] = useState(initialForm?.title ?? "");
   const [titleAr, setTitleAr] = useState(initialForm?.title_ar ?? "");
@@ -182,13 +180,18 @@ export function FormBuilder({
 
     setSaving(true);
     try {
-      if (initialForm) {
-        const { error } = await supabase.from("forms").update(payload).eq("id", initialForm.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("forms").insert({ ...payload, created_by: userId });
-        if (error) throw error;
-      }
+      const res = initialForm
+        ? await fetch(`/api/forms/${initialForm.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+        : await fetch("/api/forms", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+      if (!res.ok) throw new Error();
       toast.success(t("builder.savedSuccess"));
       router.push("/admin/builder");
       router.refresh();
@@ -203,9 +206,13 @@ export function FormBuilder({
   async function archiveForm() {
     if (!initialForm) return;
     setSaving(true);
-    const { error } = await supabase.from("forms").update({ is_active: false }).eq("id", initialForm.id);
+    const res = await fetch(`/api/forms/${initialForm.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: false }),
+    });
     setSaving(false);
-    if (error) {
+    if (!res.ok) {
       toast.error(t("common.error"));
       return;
     }

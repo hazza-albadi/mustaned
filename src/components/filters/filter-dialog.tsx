@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/config";
 import {
   Dialog,
@@ -29,7 +28,6 @@ export function FilterDialog({
 }) {
   const { t } = useI18n();
   const router = useRouter();
-  const supabase = createClient();
 
   const [name, setName] = useState("");
   const [nameAr, setNameAr] = useState("");
@@ -47,14 +45,23 @@ export function FilterDialog({
     setSaving(true);
 
     const payload = { name, name_ar: nameAr };
-    const { error } = filter
-      ? await supabase.from("filters").update(payload).eq("id", filter.id)
-      : await supabase.from("filters").insert(payload);
+    const res = filter
+      ? await fetch(`/api/filters/${filter.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      : await fetch("/api/filters", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+    const body = await res.json().catch(() => ({}));
 
     setSaving(false);
 
-    if (error) {
-      toast.error(error.message);
+    if (!res.ok) {
+      toast.error(body.error ?? t("common.error"));
       return;
     }
 
