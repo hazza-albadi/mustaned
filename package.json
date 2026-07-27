@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx scripts/seed.ts",
-    "seed:org": "tsx scripts/seed-org.ts"
+    "seed:org": "tsx scripts/seed-org.ts",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -48,6 +50,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.2",
     "@types/react": "^18",
@@ -56,6 +59,8 @@
     "dotenv": "^17.4.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
+    "jest": "^30.4.2",
+    "jest-environment-node": "^30.4.1",
     "postcss": "^8",
     "tailwindcss": "^4.3.2",
     "tsx": "^4.22.4",
