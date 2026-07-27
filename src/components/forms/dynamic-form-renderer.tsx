@@ -176,7 +176,7 @@ export function DynamicFormRenderer({
 
       {!hasRouting ? (
         <Alert variant="destructive">
-          <AlertDescription>{t("fill.noDepartmentError")}</AlertDescription>
+          <AlertDescription>{t("fill.noPositionError")}</AlertDescription>
         </Alert>
       ) : (
         <form onSubmit={onSubmit} className="space-y-6">

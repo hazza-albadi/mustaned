@@ -227,7 +227,6 @@ async function seedForms(adminId: string) {
       title_ar: form.title_ar,
       description: form.description,
       fields: form.fields,
-      allowed_departments: null,
       requires_approval: true,
       requires_comment: true,
       is_active: true,

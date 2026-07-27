@@ -125,7 +125,7 @@
     "attachments": "Attachments",
     "submitSuccess": "Your request was submitted successfully",
     "submitError": "Failed to submit your request",
-    "noDepartmentError": "You are not assigned to a position. Please contact your administrator.",
+    "noPositionError": "You are not assigned to a position. Please contact your administrator.",
     "draftSaved": "Draft saved",
     "continueDraft": "You have a saved draft for this form. Continue where you left off?",
     "discardDraft": "Discard",
@@ -135,7 +135,7 @@
     "tableNoRowsSubmitted": "No rows submitted"
   },
   "admin": {
-    "panelTitle": "Department Admin Panel",
+    "panelTitle": "Admin Panel",
     "pendingRequests": "Pending Requests",
     "approve": "Approve",
     "reject": "Reject",
