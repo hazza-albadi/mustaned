@@ -71,8 +71,17 @@
     "civilId": "Civil ID",
     "passwordHint": "At least 10 characters, with uppercase, lowercase, a number, and a symbol",
     "pendingApproval": "Your account is pending admin approval",
+    "awaitingDirectory": "Your request was approved and your account is being set up",
     "signupRejected": "Your sign-up request was not approved",
-    "signupSuccessDesc": "Your sign-up request has been submitted and is pending admin approval."
+    "signupSuccessDesc": "Your sign-up request has been submitted and is pending admin approval.",
+    "checkStatus": "Check my request status",
+    "checkStatusTitle": "Check sign-up request status",
+    "checkAnother": "Check another Civil ID",
+    "statusNotFound": "No sign-up request was found for this Civil ID.",
+    "statusPending": "Your request is pending admin review.",
+    "statusAwaitingDirectory": "Your request was approved and your account is being set up.",
+    "statusRejected": "Your sign-up request was not approved.",
+    "statusActive": "Your account is active — you can sign in normally."
   },
   "roles": {
     "SUPER_ADMIN": "Super Admin",
@@ -276,7 +285,21 @@
     "confirmRejectTitle": "Reject this sign-up request?",
     "assignPosition": "Assign position (optional)",
     "assignLater": "Assign later",
-    "noPositionsAvailable": "No vacant positions available"
+    "noPositionsAvailable": "No vacant positions available",
+    "civilIdCheck": "Civil ID Check",
+    "emailCheck": "Email Check",
+    "verificationUnavailable": "Not auto-verified",
+    "verificationFailed": "Failed",
+    "verificationVerified": "Verified",
+    "handoffTitle": "Directory Account Creation",
+    "handoffDesc": "Approved requests waiting on a directory account. Create the account through your normal IT process, then mark it created here.",
+    "nameEn": "Name (English)",
+    "nameAr": "Name (Arabic)",
+    "position": "Position",
+    "approvedAt": "Approved At",
+    "markCreated": "Mark as Created",
+    "confirmMarkCreatedTitle": "Mark this account as created in the directory?",
+    "confirmMarkCreatedDesc": "This activates their Mustanad account. Only confirm once the directory account actually exists."
   },
   "errors": {
     "notFound": "Page not found",

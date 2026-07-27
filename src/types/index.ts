@@ -8,6 +8,10 @@
 // enough for that check and silently collapse the whole client to `never`.
 // ============================================================================
 
+import type { VerificationResult } from "@/lib/verification/types";
+import type { CivilIdVerificationDetails } from "@/lib/verification/kawader";
+import type { EmailAvailabilityDetails } from "@/lib/verification/directory";
+
 export type Role = "SUPER_ADMIN" | "ADMIN" | "DEPARTMENT_HEAD" | "EMPLOYEE";
 
 // Matches the real /admin pages exactly — one permission per page. Managing
@@ -90,7 +94,11 @@ export type Filter = {
   updated_at: string;
 };
 
-export type AccountStatus = "PENDING" | "ACTIVE" | "REJECTED";
+// APPROVED_AWAITING_DIRECTORY: admin-approved but IT hasn't created the
+// directory account yet (see POST /api/signups/[id]/mark-created). Treated
+// exactly like PENDING everywhere access is gated (auth_is_approved(),
+// middleware) — it only differs in what message/UI a person or admin sees.
+export type AccountStatus = "PENDING" | "ACTIVE" | "REJECTED" | "APPROVED_AWAITING_DIRECTORY";
 
 export type Profile = {
   id: string;
@@ -105,8 +113,19 @@ export type Profile = {
   civil_id: string | null;
   // ACTIVE for every account provisioned by an admin. Self-service sign-up
   // is the only path that creates a PENDING profile, resolved to ACTIVE or
-  // REJECTED by an admin with approve_signups.
+  // REJECTED (or APPROVED_AWAITING_DIRECTORY, then later ACTIVE) by an admin
+  // with approve_signups.
   account_status: AccountStatus;
+  // Results recorded at submission time by verifyCivilId()/
+  // checkEmailAvailable() (src/lib/verification/*) — null for every account
+  // not created through self-service sign-up.
+  civil_id_verification: VerificationResult<CivilIdVerificationDetails> | null;
+  email_verification: VerificationResult<EmailAvailabilityDetails> | null;
+  // Set when an admin approves the request (moves PENDING ->
+  // APPROVED_AWAITING_DIRECTORY). Null until then, and for non-sign-up
+  // accounts.
+  approved_by: string | null;
+  approved_at: string | null;
   created_at: string;
   updated_at: string;
 };

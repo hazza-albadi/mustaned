@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApproveSignupDialog } from "@/components/signups/approve-signup-dialog";
+import { VerificationBadge, verificationDetail } from "@/components/signups/verification-badge";
 import type { OrgNode, Profile } from "@/types";
 import { toast } from "sonner";
 
@@ -70,7 +71,9 @@ export function SignupRequestsTable({
           <TableHeader>
             <TableRow>
               <TableHead>{t("auth.civilId", "Civil ID")}</TableHead>
+              <TableHead>{t("signups.civilIdCheck", "Civil ID Check")}</TableHead>
               <TableHead>{t("common.email")}</TableHead>
+              <TableHead>{t("signups.emailCheck", "Email Check")}</TableHead>
               <TableHead>{t("common.status")}</TableHead>
               <TableHead>{t("common.actions")}</TableHead>
             </TableRow>
@@ -79,7 +82,23 @@ export function SignupRequestsTable({
             {pending.map((r) => (
               <TableRow key={r.id}>
                 <TableCell className="font-mono">{r.civil_id}</TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    <VerificationBadge result={r.civil_id_verification} />
+                    {verificationDetail(r.civil_id_verification) && (
+                      <p className="text-xs text-muted-foreground">{verificationDetail(r.civil_id_verification)}</p>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>{r.email}</TableCell>
+                <TableCell>
+                  <div className="space-y-1">
+                    <VerificationBadge result={r.email_verification} />
+                    {verificationDetail(r.email_verification) && (
+                      <p className="text-xs text-muted-foreground">{verificationDetail(r.email_verification)}</p>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Badge variant="secondary">{t("signups.pending", "Pending")}</Badge>
                 </TableCell>
@@ -98,7 +117,13 @@ export function SignupRequestsTable({
             {rejected.map((r) => (
               <TableRow key={r.id} className="opacity-70">
                 <TableCell className="font-mono">{r.civil_id}</TableCell>
+                <TableCell>
+                  <VerificationBadge result={r.civil_id_verification} />
+                </TableCell>
                 <TableCell>{r.email}</TableCell>
+                <TableCell>
+                  <VerificationBadge result={r.email_verification} />
+                </TableCell>
                 <TableCell>
                   <Badge variant="destructive">{t("signups.rejected", "Rejected")}</Badge>
                 </TableCell>
@@ -109,7 +134,7 @@ export function SignupRequestsTable({
             ))}
             {requests.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                   {t("common.noResults")}
                 </TableCell>
               </TableRow>

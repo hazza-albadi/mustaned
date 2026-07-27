@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { signupRequestSchema } from "@/lib/validations";
 import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
 import { createSignupUser } from "@/lib/create-signup-user";
+import { verifyCivilId } from "@/lib/verification/kawader";
+import { checkEmailAvailable } from "@/lib/verification/directory";
 
 // Public, unauthenticated — the app's only account-creation surface that
 // doesn't require an existing admin session, so it gets the tightest rate
@@ -39,11 +41,31 @@ export async function POST(request: Request) {
         ? "A sign-up request with this Civil ID or email is already pending review"
         : existing.account_status === "REJECTED"
           ? "This sign-up request was previously rejected. Contact an administrator."
-          : "An account with this Civil ID or email already exists";
+          : existing.account_status === "APPROVED_AWAITING_DIRECTORY"
+            ? "This sign-up request was already approved and is awaiting directory account creation"
+            : "An account with this Civil ID or email already exists";
     return NextResponse.json({ error: message }, { status: 409 });
   }
 
-  const { data: created, error } = await createSignupUser({ civil_id, email, password });
+  // Neither adapter is wired to a real API yet (see the TODO markers in
+  // src/lib/verification/kawader.ts and directory.ts) — both currently
+  // always resolve "unavailable". Run in parallel since they're independent
+  // checks against two unrelated systems. Results are stored on the request
+  // regardless of outcome (including "unavailable") so the reviewing admin
+  // sees exactly what was auto-checked; neither result blocks submission
+  // here — the admin makes the actual approve/reject call.
+  const [civilIdVerification, emailVerification] = await Promise.all([
+    verifyCivilId(civil_id),
+    checkEmailAvailable(email),
+  ]);
+
+  const { data: created, error } = await createSignupUser({
+    civil_id,
+    email,
+    password,
+    civilIdVerification,
+    emailVerification,
+  });
   if (error || !created.user) {
     return NextResponse.json({ error: error?.message ?? "Failed to create sign-up request" }, { status: 400 });
   }

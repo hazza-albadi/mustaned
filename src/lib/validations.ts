@@ -147,6 +147,14 @@ export const signupRequestSchema = z.object({
   password: passwordComplexity,
 });
 
+// Public, unauthenticated "check my request status" lookup — civil_id only,
+// same format rule as signupRequestSchema. Deliberately accepts nothing else
+// (no email/name), so the endpoint can't be used to search by anything but
+// the one key a requester already knows is theirs.
+export const statusLookupSchema = z.object({
+  civil_id: civilIdSchema,
+});
+
 export const signupApprovalSchema = z.object({
   // Optional org-chart position to place them into as part of approval —
   // reuses the same assigned_profile_id mechanism as the org chart's

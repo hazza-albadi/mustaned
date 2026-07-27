@@ -83,9 +83,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     role = (count ?? 0) > 0 ? "DEPARTMENT_HEAD" : "EMPLOYEE";
   }
 
+  // Approval no longer activates the account directly — it moves the
+  // request into APPROVED_AWAITING_DIRECTORY, where it stays (is_active
+  // still false, so auth_is_approved() keeps blocking real access exactly
+  // like it does for PENDING) until IT creates the actual directory account
+  // and an admin marks it done via POST /api/signups/[id]/mark-created,
+  // which is the only thing that flips is_active/account_status to ACTIVE.
   const { error: profileError } = await admin
     .from("profiles")
-    .update({ account_status: "ACTIVE", is_active: true, role })
+    .update({
+      account_status: "APPROVED_AWAITING_DIRECTORY",
+      role,
+      approved_by: caller.user.id,
+      approved_at: new Date().toISOString(),
+    })
     .eq("id", id);
   if (profileError) {
     return NextResponse.json({ error: profileError.message }, { status: 400 });
@@ -98,9 +109,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       .eq("id", node_id);
     if (nodeError) {
       // The profile is already correctly approved at this point — a failed
-      // placement just leaves them ACTIVE-but-unassigned, exactly like any
-      // other newly-approved account for whom the admin skipped node_id.
-      // They can still be placed normally afterward via the Org Chart page.
+      // placement just leaves them APPROVED_AWAITING_DIRECTORY-but-unassigned,
+      // exactly like any other newly-approved account for whom the admin
+      // skipped node_id. They can still be placed normally afterward via the
+      // Org Chart page.
       // Returned as a 200 + `warning` (not `error`) so the client's generic
       // `if (!res.ok) throw` success/failure convention still reports this
       // as a completed approval, just with a surfaced caveat.

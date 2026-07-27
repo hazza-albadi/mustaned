@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { LanguageSwitcher } from "@/components/common/language-switcher";
 import { UtasLogo } from "@/components/common/utas-logo";
+import { CheckStatusDialog } from "@/components/auth/check-status-dialog";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 // Temporary rollout toggle — flip to true to bring the Sign Up tab back.
@@ -45,6 +46,8 @@ export function LoginForm() {
   const [signupError, setSignupError] = useState<string | null>(null);
   const [signupLoading, setSignupLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+
+  const [checkStatusOpen, setCheckStatusOpen] = useState(false);
 
   function completeLogin() {
     // S-05: only ever follow a relative, same-origin path. A bare "/" prefix
@@ -91,7 +94,9 @@ export function LoginForm() {
       setError(
         profile.account_status === "PENDING"
           ? t("auth.pendingApproval", "Your account is pending admin approval")
-          : t("auth.signupRejected", "Your sign-up request was not approved")
+          : profile.account_status === "APPROVED_AWAITING_DIRECTORY"
+            ? t("auth.awaitingDirectory", "Your request was approved and your account is being set up")
+            : t("auth.signupRejected", "Your sign-up request was not approved")
       );
       return;
     }
@@ -343,8 +348,14 @@ export function LoginForm() {
               </TabsContent>
             </Tabs>
           )}
+          {!mfaFactorId && (
+            <Button type="button" variant="link" className="w-full" onClick={() => setCheckStatusOpen(true)}>
+              {t("auth.checkStatus", "Check my request status")}
+            </Button>
+          )}
         </CardContent>
       </Card>
+      <CheckStatusDialog open={checkStatusOpen} onOpenChange={setCheckStatusOpen} />
     </div>
   );
 }
