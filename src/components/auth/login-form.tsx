@@ -97,6 +97,13 @@ export function LoginForm() {
       return;
     }
 
+    // Fire-and-forget Kawader employee-data sync (scaffolding only — see
+    // src/lib/verification/kawader.ts's fetchEmployeeProfile(), currently
+    // always "unavailable"). Deliberately not awaited: this must never slow
+    // down or block login, so its result (success, failure, or a slow
+    // Kawader once that's real) has zero effect on what happens next here.
+    fetch("/api/auth/kawader-sync", { method: "POST" }).catch(() => {});
+
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (aal && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
       const { data: factors } = await supabase.auth.mfa.listFactors();

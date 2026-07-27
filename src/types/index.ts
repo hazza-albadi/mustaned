@@ -126,6 +126,18 @@ export type Profile = {
   // accounts.
   approved_by: string | null;
   approved_at: string | null;
+  // Informational-only snapshot from a Kawader lookup at login (see
+  // POST /api/auth/kawader-sync) — purely reference data, never consulted
+  // by org-chart/approval-routing logic. Null until a "verified" result
+  // actually lands (today: always null, since civil_id itself is null for
+  // every account except self-service sign-up, and that adapter is still a
+  // stub — see 0017_kawader_employee_profile.sql).
+  kawader_full_name: string | null;
+  kawader_full_name_ar: string | null;
+  kawader_department: string | null;
+  kawader_phone: string | null;
+  kawader_job_path: string | null;
+  kawader_synced_at: string | null;
   created_at: string;
   updated_at: string;
 };
