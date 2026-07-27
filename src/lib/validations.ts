@@ -2,6 +2,16 @@ import { z } from "zod";
 import type { FormField } from "@/types";
 import { isDisplayField, MAX_TABLE_ROWS, MAX_TABLE_COLUMNS, MAX_TABLE_CELL_LENGTH } from "@/lib/form-fields";
 
+// S-05: only ever follow a relative, same-origin path from a login `redirect`
+// query param. A bare "/" prefix check alone isn't enough — "//evil.com" and
+// "/\evil.com" both parse as protocol-relative external URLs in a browser, so
+// those are rejected too. Extracted from login-form.tsx (was inline, unnamed
+// and untested) so it can be unit tested directly rather than only via a live
+// login flow.
+export function isSafeRedirectPath(path: string | null): path is string {
+  return !!path && path.startsWith("/") && !path.startsWith("//") && !path.startsWith("/\\");
+}
+
 /**
  * Builds a Zod schema at runtime from a form's dynamic JSONB field
  * definitions, so validation rules (required, min/max, pattern) defined by
@@ -137,7 +147,7 @@ export const adminPermissionEnum = z.enum([
 // Oman Civil ID: 8-digit numeric identifier. ASSUMPTION — no authoritative
 // spec was available in this repo to confirm the exact format; adjust this
 // regex if it turns out to differ.
-const civilIdSchema = z.string().regex(/^[0-9]{8}$/, "Civil ID must be 8 digits");
+export const civilIdSchema = z.string().regex(/^[0-9]{8}$/, "Civil ID must be 8 digits");
 
 export const signupRequestSchema = z.object({
   civil_id: civilIdSchema,

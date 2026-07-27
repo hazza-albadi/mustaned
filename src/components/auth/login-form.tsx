@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/config";
+import { isSafeRedirectPath } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,13 +51,8 @@ export function LoginForm() {
   const [checkStatusOpen, setCheckStatusOpen] = useState(false);
 
   function completeLogin() {
-    // S-05: only ever follow a relative, same-origin path. A bare "/" prefix
-    // check alone isn't enough — "//evil.com" and "/\evil.com" both parse as
-    // protocol-relative external URLs in a browser, so those are rejected too.
     const rawRedirect = searchParams.get("redirect");
-    const isSafeRedirect =
-      !!rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") && !rawRedirect.startsWith("/\\");
-    const redirectTo = isSafeRedirect ? rawRedirect : "/";
+    const redirectTo = isSafeRedirectPath(rawRedirect) ? rawRedirect : "/";
     router.push(redirectTo);
     router.refresh();
   }

@@ -22,6 +22,13 @@ const csp = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Only actually needed for `next/jest` (see jest.config.js): the
+  // installed `uuid` version ships ESM-only, and next/jest computes its
+  // Jest transformIgnorePatterns from this exact field rather than letting
+  // a plain custom transformIgnorePatterns override its default blanket
+  // `/node_modules/` ignore. next build/webpack already handles uuid's ESM
+  // output fine without this — it's here purely to unlock that Jest logic.
+  transpilePackages: ["uuid"],
   async headers() {
     return [
       {
