@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { orgNodeSchema } from "@/lib/validations";
 import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
@@ -55,6 +56,12 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
+
+  // Caching audit: getAllOrgNodes() (src/lib/org-nodes-cache.ts) caches the
+  // full org_nodes table for every page that reads the org chart — without
+  // this, a newly created position wouldn't show up until that cache's
+  // time-based revalidate window (60s) elapsed.
+  revalidateTag("org-nodes");
 
   return NextResponse.json(data, { status: 201 });
 }

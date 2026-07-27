@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { signupApprovalSchema } from "@/lib/validations";
 import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
@@ -118,6 +119,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       // as a completed approval, just with a surfaced caveat.
       return NextResponse.json({ ok: true, warning: `Approved, but failed to assign position: ${nodeError.message}` });
     }
+    // Keeps getAllOrgNodes()'s cache (src/lib/org-nodes-cache.ts) from
+    // showing this position as still vacant.
+    revalidateTag("org-nodes");
   }
 
   return NextResponse.json({ ok: true });

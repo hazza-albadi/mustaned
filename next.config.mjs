@@ -35,6 +35,19 @@ const nextConfig = {
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
         ],
       },
+      {
+        // Caching audit finding: unlike /_next/static/* (content-hashed by
+        // webpack, already served `immutable, max-age=31536000` by Next
+        // itself), files under /public keep their literal filename and get
+        // Next's own conservative `max-age=0` default — confirmed via a
+        // local production server, not assumed. logo.png specifically is
+        // requested by that bare, unhashed name, so a full year+immutable
+        // would risk serving a stale logo indefinitely if it's ever replaced
+        // without a rename. A one-day window is long enough to meaningfully
+        // cut repeat-visit requests without that risk.
+        source: "/logo.png",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
+      },
     ];
   },
 };

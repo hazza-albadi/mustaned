@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { getAllOrgNodes } from "@/lib/org-nodes-cache";
 import { AppShell } from "@/components/nav/app-shell";
 import { DynamicFormRenderer } from "@/components/forms/dynamic-form-renderer";
 import type { FormDefinition } from "@/types";
@@ -16,10 +17,11 @@ export default async function FillFormPage({
   const profile = await requireProfile();
   const supabase = await createClient();
 
-  const [{ data: form }, { data: assignedNode }] = await Promise.all([
+  const [{ data: form }, orgNodes] = await Promise.all([
     supabase.from("forms").select("*").eq("id", formId).eq("is_active", true).single(),
-    supabase.from("org_nodes").select("id").eq("assigned_profile_id", profile.id).eq("is_active", true).maybeSingle(),
+    getAllOrgNodes(),
   ]);
+  const hasOrgNodeAssignment = orgNodes.some((n) => n.assigned_profile_id === profile.id && n.is_active);
 
   if (!form) notFound();
 
@@ -28,7 +30,7 @@ export default async function FillFormPage({
       <DynamicFormRenderer
         form={form as FormDefinition}
         userId={profile.id}
-        hasOrgNodeAssignment={Boolean(assignedNode)}
+        hasOrgNodeAssignment={hasOrgNodeAssignment}
       />
     </AppShell>
   );

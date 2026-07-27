@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { orgNodeSchema } from "@/lib/validations";
 import { rateLimitAsync, getClientIp } from "@/lib/rate-limit";
@@ -110,6 +111,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  // See the matching comment in ../route.ts (POST) — keeps getAllOrgNodes()'s
+  // cache (src/lib/org-nodes-cache.ts) from showing a stale title/parent/
+  // assignment after an edit.
+  revalidateTag("org-nodes");
+
   return NextResponse.json(data);
 }
 
@@ -124,6 +130,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
   const { id } = await params;
   const { error } = await caller.supabase.from("org_nodes").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  revalidateTag("org-nodes");
 
   return NextResponse.json({ ok: true });
 }

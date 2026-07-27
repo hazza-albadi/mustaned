@@ -1,9 +1,10 @@
 import { requirePermission } from "@/lib/auth";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { getAllOrgNodes } from "@/lib/org-nodes-cache";
 import { AppShell } from "@/components/nav/app-shell";
 import { SignupRequestsTable } from "@/components/signups/signup-requests-table";
 import { DirectoryHandoffTable } from "@/components/signups/directory-handoff-table";
-import type { OrgNode, Profile } from "@/types";
+import type { Profile } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -16,17 +17,17 @@ export default async function SignupsPage() {
   // resolveOrgPosition(), which needs to find the node they were placed
   // into, not just the still-empty ones. Vacant filtering for the approve
   // dialog's picker happens below, in memory.
-  const [{ data: requests }, { data: nodes }] = await Promise.all([
+  const [{ data: requests }, orgNodes] = await Promise.all([
     supabase
       .from("profiles")
       .select("*")
       .neq("account_status", "ACTIVE")
       .order("created_at", { ascending: false }),
-    supabase.from("org_nodes").select("*").order("title"),
+    getAllOrgNodes(),
   ]);
 
   const allRequests = (requests ?? []) as Profile[];
-  const allNodes = (nodes ?? []) as OrgNode[];
+  const allNodes = [...orgNodes].sort((a, b) => a.title.localeCompare(b.title));
   const vacantNodes = allNodes.filter((n) => n.is_active && !n.assigned_profile_id);
 
   const approverIds = Array.from(
